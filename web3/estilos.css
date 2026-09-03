@@ -1,0 +1,110 @@
+/* CONFIGURACION GENERAL DE ESTILOS CSS Y FORMATEO DE PAGINA */
+/* Emiliminar todos los margenes y paddings por defecto de todos los elementos */
+body{
+margin: 0;
+padding: 20px;
+/*Configuracion del espacio al borde del navegador*/
+font-family: Arial, Helvetica, sans-serif;
+background-color: #f2f2f2;
+min-height: 100vh;
+/* ajuste del navegador */
+}
+
+.container{
+width: 100%;
+}
+/* HEADER */
+header{
+background: #c9a278;
+color: #fff;
+padding: 30px;
+border-radius: 20px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+
+nav ul{ /* lista de elementos del menu */
+    list-style: none;
+    background: #81bc73;
+    margin: 30px;
+    padding: 15px;
+    display: flex;
+    gap: 20px;
+    border-radius: 15px; /* redondeo de bordes */
+}
+nav ul li{ /* elementos de la lista del menu */
+    text-decoration: none;
+    color: #8b7754;
+    font-weight: bold; 
+}
+nav a:hover{
+    color: #c55cbb;
+}
+
+.layout{ /* contenedor de la estructura de la pagina */
+    display: grid; /* se define como un grid */
+    gap: 20px; /* espacio entre columnas */
+    margin-top: 35px; /* espacio entre columnas */
+    grid-template-columns: 2fr 1fr; /* 2 columnas, la primera ocupa el doble de espacio que la segunda */
+
+}
+
+main{ /* contenedor de la estructura de la pagina */
+    background: #5f5757;
+    padding: 20px; /* espacio interno */
+    border-radius: 20px;
+}
+
+article{
+    background: #b67e7e;
+    padding: 20px; /* espacio interno */
+    border-radius:15px;
+}
+
+section{
+    background: #ba6f96;
+    padding: 25px; /* espacio interno */
+    border-radius:15px;
+    margin-bottom: 20px; /* espacio entre secciones */
+}
+
+/*footer{
+    background: #c9a278;
+    color: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 10px; espacio entre columnas 
+} */
+
+.main-footer{
+    background: #c9a278;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex; 
+    justify-content: space-between;
+
+}
+
+/*ASIDE */
+aside{
+    background: #8da8d2;
+    padding: 20px;
+    border-radius: 15px;
+}
+    
+aside section{
+    background: #edeef0;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+}
+
+/* FOOTER */
+.page-footer{
+    background: #3b3c41;
+    padding: 15px;
+    border-radius: 20px;
+    text-align: center;
+    font-size: 20px;
+}
