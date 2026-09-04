@@ -1,13 +1,13 @@
-p {
+p { /* Estilo para todos los párrafos */
         color: blue;
-        font-size: 18px;
+        font-size: 18px;/* Tamaño de fuente */
     }
 
-    .parrafo1 {
-        color: red;
-        background-color: #b3cba163;
+    .parrafo1 {/* Estilo para el primer párrafo */
+        color: red;/* Color del texto */
+        background-color: #b3cba163;/* Color de fondo con transparencia */
     }
-    .parrafo2 {
+    .parrafo2 {/* Estilo para el segundo párrafo */
         color: green;
         background-color: #b3cba163;
     }
