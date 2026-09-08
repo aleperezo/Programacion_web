@@ -1,0 +1,60 @@
+body{
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+header{
+    background-color: #9b9898;
+    color: aliceblue;
+    padding:10px 0; /* Ajuste de padding para mejorar la apariencia */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header div{
+    margin: 25px; 
+} 
+
+header h1{
+    margin: 0px;
+    padding-left: 25px; /* Ajuste de padding para mejorar la apariencia */
+
+}
+
+nav ul{
+    list-style: none; /* Eliminamos los biñetas de la lista */
+    margin: 0px;
+    padding-right: 45px; /* Ajuste de padding para mejorar la apariencia */
+
+}
+nav ul li{
+    display: inline; /* Mostramos los elementos de la lista en línea */
+    margin-right: 25px; /* Espaciado entre los elementos de la lista */
+}
+section{
+    background-color: #9dbade;
+    padding: 20px;
+    margin: 10px;
+    border-radius: 15px; /* Bordes redondeados para mejorar la apariencia */
+    box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.1); /* Sombra para dar profundidad */
+}
+
+h2{
+    color: aquamarine; /* Color del texto */
+    text-align: left; /* Centramos el texto */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Ajustamos la fuente */
+
+}
+
+footer{
+    background-color: rgb(133, 181, 152);
+    color: rgb(39, 38, 37);
+    text-align: center;
+    position: flex; /* Fijamos el pie de página en la parte inferior */
+    margin: 35px; /* Ajuste de margen superior para separar del contenido */
+    border-radius: 15px; /* Bordes redondeados para mejorar la apariencia */
+    padding: 20px; /* Ajuste de padding para mejorar la apariencia */
+    front-size: 15px; /* Ajuste del tamaño de fuente para mejorar la legibilidad */
+}
