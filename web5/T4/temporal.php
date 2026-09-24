@@ -8,7 +8,7 @@
 <body>
     <a href="index.html">Index</a> <br>
     <a href="temporal.html">Temporal</a>
-    <h1>Este es un temporal en PHP el archivo se llama temporal.php y este archivo puede trabajar con un leguaje de programacions</h1>
+    <h1>Este es un temporal en PHP el archivo se llama temporal.php y este archivo puede trabajar con un leguaje de programacion</h1>
 
     
 </body>
