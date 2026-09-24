@@ -12,6 +12,7 @@ $nombreUsuario=$_SESSION['nombre'];
 </head>
 <body>
     <h1>Eres mayor, genial: <?php echo $nombreUsuario?></h1>
+    <h1>Este es un archivo mayor.php y este archivo puede trabajar con un leguaje de programacion</h1>
     <a href="index.html">Regresar a formulario</a>
     
 </body>
