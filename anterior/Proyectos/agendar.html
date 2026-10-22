@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda tu Visita | GYMICO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { brand: { DEFAULT: '#dc2626', dark: '#b91c1c' }, dark: { 900: '#111827', 800: '#1f2937', 700: '#374151' } },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], heading: ['Oswald', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-dark-900 text-gray-200 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Navbar Simple conectada al index -->
+    <nav class="w-full bg-dark-900/95 backdrop-blur-sm border-b border-dark-800 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex-shrink-0">
+                    <a href="index.html" class="font-heading text-3xl font-bold uppercase tracking-wider">
+                        <span class="text-white">GYM</span><span class="text-brand">ICO</span>
+                    </a>
+                </div>
+                <div>
+                    <a href="index.html" class="text-gray-400 hover:text-white transition flex items-center gap-2">
+                        <i class="fas fa-arrow-left"></i> Volver al inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-6xl w-full bg-dark-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col lg:flex-row">
+            
+            <!-- Formulario -->
+            <div class="w-full lg:w-1/2 p-8 sm:p-12">
+                <div class="mb-8">
+                    <h2 class="font-heading text-3xl md:text-4xl font-bold text-white uppercase mb-2">Ven a <span class="text-brand">conocernos</span></h2>
+                    <p class="text-gray-400 text-sm">Déjanos tus datos y elige un horario. Te enviaremos un correo con tu pase.</p>
+                </div>
+
+                <form id="form-visita" class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1">Nombre Completo</label>
+                        <input type="text" required class="w-full bg-dark-900 border border-dark-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Correo Electrónico</label>
+                            <input type="email" required class="w-full bg-dark-900 border border-dark-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Teléfono</label>
+                            <input type="tel" required class="w-full bg-dark-900 border border-dark-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Fecha de Visita</label>
+                            <input type="date" required class="w-full bg-dark-900 border border-dark-700 text-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition" style="color-scheme: dark;">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Horario Sugerido</label>
+                            <select required class="w-full bg-dark-900 border border-dark-700 text-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition">
+                                <option value="" disabled selected>Selecciona una hora</option>
+                                <option value="manana">Mañana (6:00 AM - 12:00 PM)</option>
+                                <option value="tarde">Tarde (12:00 PM - 6:00 PM)</option>
+                                <option value="noche">Noche (6:00 PM - 10:00 PM)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-brand hover:bg-brand-dark text-white font-bold py-4 rounded-lg uppercase tracking-wide transition transform hover:-translate-y-1 mt-4 shadow-lg shadow-brand/30">
+                        Confirmar Visita
+                    </button>
+                </form>
+
+                <div id="mensaje-exito" class="hidden mt-6 p-4 bg-green-900/50 border border-green-500 rounded-lg text-center">
+                    <i class="fas fa-check-circle text-green-500 text-3xl mb-2"></i>
+                    <h4 class="text-white font-bold text-lg">¡Cita Agendada!</h4>
+                    <p class="text-gray-300 text-sm">Pase de acceso enviado a tu correo.</p>
+                </div>
+            </div>
+
+            <!-- Mapa -->
+            <div class="w-full lg:w-1/2 bg-dark-900 relative">
+                <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=2074&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover opacity-40 grayscale contrast-125">
+                <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-transparent to-transparent"></div>
+                
+                <div class="absolute bottom-0 left-0 w-full p-8 sm:p-12">
+                    <div class="bg-dark-800/90 backdrop-blur-md p-6 rounded-xl border border-dark-700 shadow-xl">
+                        <h3 class="font-heading text-xl font-bold text-white uppercase mb-4 flex items-center gap-2">
+                            <i class="fas fa-map-marker-alt text-brand"></i> Nuestra Ubicación
+                        </h3>
+                        <p class="text-gray-300 text-sm mb-4 leading-relaxed">
+                            <strong>GYMICO Central</strong><br>Av. Central 123, Colonia Centro<br>Nezayork, Estado de México, C.P. 18000
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('form-visita').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('button[type="submit"]');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Procesando...';
+            btn.disabled = true;
+            setTimeout(() => {
+                this.style.display = 'none';
+                document.getElementById('mensaje-exito').classList.remove('hidden');
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

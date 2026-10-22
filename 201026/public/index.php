@@ -26,19 +26,6 @@ require_once __DIR__ . '/../config/db.php';
             </tr>
         </thead>
         <tbody>
-            <?php
-            $sql = "SELECT * FROM alumnos";
-            $stmt = $pdo->query($sql);
-            while($row = $stmt->fetch()){
-                echo "<tr>";
-                echo "<td>" . $row['id'] . "</td>";
-                echo "<td>" . $row['nombre'] . "</td>";
-                echo "<td>" . $row['correo'] . "</td>";
-                echo "<td>" . $row['creado'] . "</td>";
-                echo "<td><a href='edit.php?id=" . $row['id'] . "'>Editar</a> | <a href='delete.php?id=" . $row['id'] . "'>Eliminar</a></td>";
-                echo "</tr>";
-            }
-            ?>
         </tbody>
 </body>
 </html>

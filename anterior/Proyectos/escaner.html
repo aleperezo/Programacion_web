@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recepción y Control de Acceso | GYMICO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { brand: { DEFAULT: '#dc2626', dark: '#b91c1c' }, dark: { 900: '#111827', 800: '#1f2937', 700: '#374151' } },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], heading: ['Oswald', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-dark-900 text-gray-200 font-sans antialiased min-h-screen flex flex-col">
+
+    <nav class="w-full bg-dark-900/95 backdrop-blur-sm border-b border-dark-800 z-50 p-6">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="index.html" class="font-heading text-3xl font-bold uppercase tracking-wider">
+                <span class="text-white">GYM</span><span class="text-brand">ICO</span>
+            </a>
+            <a href="admin.html" class="text-gray-400 hover:text-white transition flex items-center gap-2">
+                <i class="fas fa-arrow-left"></i> Panel de Administración
+            </a>
+        </div>
+    </nav>
+
+    <main class="flex-grow flex items-center justify-center py-12 px-4">
+        <div class="max-w-md w-full bg-dark-800 rounded-2xl shadow-2xl p-8 border border-dark-700">
+            <div class="text-center mb-6">
+                <h2 class="font-heading text-3xl font-bold text-white uppercase mb-1">Control de <span class="text-brand">Recepción</span></h2>
+                <p class="text-gray-400 text-sm">Ingresa el ID del socio y el código del día.</p>
+                <div class="mt-3 bg-dark-900 py-2 px-4 rounded-lg inline-block border border-dark-700">
+                    <span class="text-xs text-gray-400 uppercase tracking-widest block">Código Diario Actual:</span>
+                    <span class="text-brand font-mono font-bold text-lg">GYM2026</span>
+                </div>
+            </div>
+
+            <!-- Formulario de Verificación con Código del Día -->
+            <form id="form-verificar" class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">ID o Credencial del Socio</label>
+                    <input type="text" id="input-id" required placeholder="Ej. GYM-0001 o 1" class="w-full bg-dark-900 border border-dark-700 text-white px-4 py-3 rounded-lg outline-none focus:border-brand uppercase font-mono">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Código del Día</label>
+                    <input type="text" id="input-codigo" required placeholder="Ej. GYM2026" class="w-full bg-dark-900 border border-dark-700 text-white px-4 py-3 rounded-lg outline-none focus:border-brand uppercase">
+                </div>
+                <button type="submit" class="w-full bg-brand hover:bg-brand-dark text-white font-bold py-3 rounded-lg uppercase tracking-wide transition shadow-lg shadow-brand/20">
+                    Verificar Socio
+                </button>
+            </form>
+
+            <!-- Tarjeta de Verificación con Foto -->
+            <div id="panel-verificacion" class="hidden mt-6 space-y-4 border-t border-dark-700 pt-6 text-center">
+                <div class="relative w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-brand shadow-xl bg-dark-900">
+                    <img id="socio-foto" src="" alt="Foto del Socio" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <h3 id="socio-nombre" class="text-2xl font-bold text-white uppercase">Nombre del Socio</h3>
+                    <p class="text-brand font-semibold text-sm mt-1" id="socio-membresia">Membresía VIP</p>
+                    <p class="text-xs text-gray-400 mt-1">ID de Socio: <span id="socio-id-text" class="text-white font-mono font-bold"></span></p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 pt-2">
+                    <button type="button" onclick="cancelarAcceso()" class="bg-dark-900 hover:bg-dark-700 text-gray-300 font-bold py-3 rounded-lg transition border border-dark-700">
+                        Cancelar
+                    </button>
+                    <button type="button" onclick="confirmarAcceso()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition shadow-lg shadow-green-600/20">
+                        Aceptar Acceso
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mensaje de éxito temporal -->
+            <div id="mensaje-exito" class="hidden bg-green-900/40 border border-green-500 rounded-xl p-6 text-center mt-6">
+                <i class="fas fa-check-circle text-green-500 text-4xl mb-2"></i>
+                <h3 class="text-xl font-bold text-white mb-1">¡Acceso Registrado!</h3>
+                <p class="text-sm text-gray-300">Entrada guardada en la base de datos con éxito.</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let socioTemporalID = null;
+
+        document.getElementById('form-verificar').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            let inputTexto = document.getElementById('input-id').value.trim();
+            const id_usuario = inputTexto.replace(/\D/g, ''); // Extraer solo los números (ej. "GYM-0001" -> "1")
+            const codigo = document.getElementById('input-codigo').value;
+
+            if (!id_usuario) {
+                alert("Por favor ingresa un ID válido.");
+                return;
+            }
+
+            try {
+                const response = await fetch('verificar_codigo.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id_usuario, codigo })
+                });
+                
+                const data = await response.json();
+
+                if (data.success) {
+                    socioTemporalID = data.id;
+                    document.getElementById('socio-nombre').innerText = data.nombre;
+                    document.getElementById('socio-membresia').innerText = "Membresía: " + data.membresia;
+                    document.getElementById('socio-id-text').innerText = "GYM-" + String(data.id).padStart(4, '0');
+                    document.getElementById('socio-foto').src = data.foto;
+
+                    document.getElementById('form-verificar').classList.add('hidden');
+                    document.getElementById('panel-verificacion').classList.remove('hidden');
+                } else {
+                    alert(data.mensaje);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Error de conexión con el servidor.");
+            }
+        });
+
+        async function confirmarAcceso() {
+            try {
+                const response = await fetch('guardar_asistencia.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id_usuario: socioTemporalID })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('panel-verificacion').classList.add('hidden');
+                    const exito = document.getElementById('mensaje-exito');
+                    exito.classList.remove('hidden');
+
+                    setTimeout(() => {
+                        exito.classList.add('hidden');
+                        document.getElementById('form-verificar').reset();
+                        document.getElementById('form-verificar').classList.remove('hidden');
+                        socioTemporalID = null;
+                    }, 3000);
+                } else {
+                    alert(data.mensaje);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
+
+        function cancelarAcceso() {
+            document.getElementById('panel-verificacion').classList.add('hidden');
+            document.getElementById('form-verificar').classList.remove('hidden');
+            document.getElementById('form-verificar').reset();
+            socioTemporalID = null;
+        }
+    </script>
+</body>
+</html>

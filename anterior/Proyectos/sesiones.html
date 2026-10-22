@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión | GYMICO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { brand: { DEFAULT: '#dc2626', dark: '#b91c1c' }, dark: { 900: '#111827', 800: '#1f2937', 700: '#374151' } },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], heading: ['Oswald', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-dark-900 text-gray-200 font-sans antialiased min-h-screen flex flex-col justify-center items-center px-4" style="background-image: linear-gradient(to bottom, rgba(17, 24, 39, 0.8), rgba(17, 24, 39, 0.95)), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1920&auto=format&fit=crop'); background-size: cover; background-position: center;">
+
+    <div class="absolute top-6 left-6">
+        <a href="index.html" class="font-heading text-2xl font-bold uppercase tracking-wider text-white">
+            GYM<span class="text-brand">ICO</span>
+        </a>
+    </div>
+
+    <div class="max-w-md w-full bg-dark-800/95 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-dark-700">
+        <div class="text-center mb-8">
+            <h2 class="font-heading text-3xl font-bold text-white uppercase mb-2">Bienvenido de <span class="text-brand">vuelta</span></h2>
+            <p class="text-gray-400 text-sm">Ingresa tus datos para acceder a tu panel de miembro.</p>
+        </div>
+
+        <!-- Formulario apuntando directamente a login.php por POST -->
+        <form action="login.php" method="POST" class="space-y-5">
+            <div>
+                <label class="block text-sm text-gray-400 mb-1">Correo Electrónico</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500"><i class="fas fa-envelope"></i></span>
+                    <input type="email" name="correo" required placeholder="correo@email.com" class="w-full bg-dark-900 border border-dark-700 text-white pl-10 pr-4 py-3 rounded-lg outline-none focus:border-brand text-sm">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm text-gray-400 mb-1">Contraseña</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500"><i class="fas fa-lock"></i></span>
+                    <input type="password" name="contrasena" required placeholder="••••••••" class="w-full bg-dark-900 border border-dark-700 text-white pl-10 pr-4 py-3 rounded-lg outline-none focus:border-brand text-sm">
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-brand hover:bg-brand-dark text-white font-bold py-3 rounded-lg uppercase tracking-wide transition shadow-lg shadow-brand/20 cursor-pointer">
+                Iniciar Sesión
+            </button>
+        </form>
+
+        <div class="text-center mt-6">
+            <a href="index.html" class="text-xs text-gray-400 hover:text-white transition"><i class="fas fa-arrow-left mr-1"></i> Regresar al inicio</a>
+        </div>
+    </div>
+
+</body>
+</html>
