@@ -1,3 +1,4 @@
+-- Active: 1790221583716@@127.0.0.1@3306@gymico_db
 <?php
 header('Content-Type: application/json');
 require 'conexion.php';
