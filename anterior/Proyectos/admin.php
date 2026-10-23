@@ -1,9 +1,6 @@
 <?php
 require 'conexion.php';
-
-// ==========================================
 // LÓGICA PARA EXPORTAR A EXCEL
-// ==========================================
 if (isset($_GET['exportar']) && $_GET['exportar'] === 'excel') {
     header("Content-Type: application/vnd.ms-excel; charset=utf-8");
     header("Content-Disposition: attachment; filename=Reporte_Ventas_GYMICO.xls");
@@ -27,10 +24,7 @@ if (isset($_GET['exportar']) && $_GET['exportar'] === 'excel') {
     echo "</table>";
     exit();
 }
-
-// ==========================================
-// 1. MANTENIMIENTO
-// ==========================================
+// MANTENIMIENTO
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registrar_mantenimiento'])) {
     $nombre_equipo = $conn->real_escape_string(trim($_POST['nombre_equipo']));
     $tipo = $conn->real_escape_string(trim($_POST['tipo']));
@@ -48,10 +42,7 @@ if (isset($_GET['resolver'])) {
     header("Location: admin.php?resuelto=1");
     exit();
 }
-
-// ==========================================
-// 2. VENTAS (CREAR, EDITAR Y ELIMINAR)
-// ==========================================
+// VENTAS (CREAR, EDITAR Y ELIMINAR)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['guardar_venta'])) {
     $id_venta = isset($_POST['id_venta']) ? intval($_POST['id_venta']) : 0;
     $concepto = $conn->real_escape_string(trim($_POST['concepto']));
@@ -73,10 +64,7 @@ if (isset($_GET['eliminar_venta'])) {
     header("Location: admin.php?eliminado=venta");
     exit();
 }
-
-// ==========================================
-// 3. EMPLEADOS
-// ==========================================
+// EMPLEADOS
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['guardar_empleado'])) {
     $id_emp = isset($_POST['id_empleado']) ? intval($_POST['id_empleado']) : 0;
     $nombre_emp = $conn->real_escape_string(trim($_POST['nombre_empleado']));
@@ -98,10 +86,7 @@ if (isset($_GET['eliminar_empleado'])) {
     header("Location: admin.php?eliminado=empleado");
     exit();
 }
-
-// ==========================================
-// 4. REPORTES
-// ==========================================
+// REPORTES
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registrar_reporte'])) {
     $tipo_rep = $conn->real_escape_string(trim($_POST['tipo_reporte']));
     $desc_rep = $conn->real_escape_string(trim($_POST['descripcion_reporte']));
@@ -119,10 +104,7 @@ if (isset($_GET['resolver_reporte'])) {
     header("Location: admin.php?resuelto=reporte");
     exit();
 }
-
-// ==========================================
-// 5. VISITAS Y RESERVAS
-// ==========================================
+// VISITAS Y RESERVAS
 if (isset($_GET['eliminar_visita'])) {
     $id_visita = intval($_GET['eliminar_visita']);
     $conn->query("DELETE FROM visitas WHERE id_visita = $id_visita");
@@ -163,18 +145,18 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
 
     <div class="max-w-7xl mx-auto">
         
-        <!-- HEADER PRINCIPAL CON BOTONES ALINEADOS -->
+        <!--BOTONES ALINEADOS -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <h1 class="font-heading text-4xl font-bold text-white uppercase"><span class="text-brand">Admin</span> GYMICO</h1>
             
-            <!-- Grupo de Botones Superiores -->
+            <!-- Botones Superiores -->
             <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                <!-- Botón de Soporte Discreto -->
+                <!-- Botón de Soporte -->
                 <a href="https://wa.me/525512345678?text=Hola,%20soy%20el%20administrador%20de%20GYMICO.%20Necesito%20reportar%20un%20error%20en%20el%20sistema." target="_blank" class="bg-dark-800 border border-green-500/50 hover:bg-green-900/40 text-green-400 px-4 py-2.5 rounded-lg font-bold transition flex items-center gap-2 shadow-lg justify-center text-sm">
                     <i class="fab fa-whatsapp text-lg"></i> Soporte (+52 55 1234 5678)
                 </a>
                 
-                <!-- Botón Original de Recepción -->
+                <!-- Botón de Recepción -->
                 <a href="escaner.html" class="bg-dark-800 border border-dark-700 hover:bg-dark-700 text-white px-4 py-2.5 rounded-lg font-bold transition flex items-center gap-2 shadow-lg justify-center text-sm">
                     <i class="fas fa-id-card text-brand"></i> Ir a Recepción
                 </a>
@@ -192,7 +174,7 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
             <button onclick="mostrarTab('reservas')" id="btn-reservas" class="text-gray-400 font-bold uppercase pb-2 border-b-2 border-transparent hover:text-white transition whitespace-nowrap">Salas Reservadas</button>
         </div>
 
-        <!-- TAB 1: SOCIOS -->
+        <!-- SOCIOS -->
         <div id="tab-socios" class="block">
             <div class="flex justify-end mb-4">
                 <button onclick="abrirModal()" class="bg-brand hover:bg-red-700 text-white px-6 py-2 rounded-lg font-bold transition shadow-lg">
@@ -211,7 +193,7 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
             </div>
         </div>
 
-        <!-- TAB 2: MANTENIMIENTO -->
+        <!-- MANTENIMIENTO -->
         <div id="tab-mantenimiento" class="hidden">
             <div class="bg-dark-800 rounded-2xl p-8 border border-dark-700 shadow-xl">
                 <h2 class="font-heading text-2xl font-bold text-white uppercase mb-6">Gestión de Equipos en Mantenimiento</h2>
@@ -232,7 +214,7 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
             </div>
         </div>
 
-        <!-- TAB 3: VENTAS -->
+        <!-- VENTAS -->
         <div id="tab-ventas" class="hidden">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-dark-800 rounded-2xl p-6 border border-dark-700 shadow-xl">
@@ -297,7 +279,7 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
             </div>
         </div>
 
-        <!-- TAB 4: EMPLEADOS -->
+        <!-- EMPLEADOS -->
         <div id="tab-empleados" class="hidden">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-dark-800 rounded-2xl p-6 border border-dark-700 shadow-xl">
@@ -335,7 +317,7 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
             </div>
         </div>
 
-        <!-- TAB 5: REPORTES -->
+        <!-- REPORTES -->
         <div id="tab-reportes" class="hidden">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-dark-800 rounded-2xl p-6 border border-dark-700 shadow-xl">
@@ -361,7 +343,7 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
             </div>
         </div>
 
-        <!-- TAB 6: VISITAS AGENDADAS -->
+        <!-- VISITAS AGENDADAS -->
         <div id="tab-visitas" class="hidden">
             <div class="bg-dark-800 rounded-2xl p-8 border border-dark-700 shadow-xl">
                 <div class="flex items-center gap-3 mb-6">
@@ -415,7 +397,7 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
             </div>
         </div>
 
-        <!-- TAB 7: RESERVAS DE SALAS -->
+        <!-- RESERVAS DE SALAS -->
         <div id="tab-reservas" class="hidden">
             <div class="bg-dark-800 rounded-2xl p-8 border border-dark-700 shadow-xl">
                 <div class="flex items-center gap-3 mb-6">
@@ -463,7 +445,7 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
 
     </div>
 
-    <!-- Modal Formulario Socios -->
+    <!-- Formulario Socios -->
     <div id="modal-usuario" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
         <div class="bg-dark-800 p-8 rounded-xl w-full max-w-lg border border-dark-700 max-h-[90vh] overflow-y-auto">
             <h2 id="modal-titulo" class="font-heading text-2xl font-bold text-white uppercase mb-6">Registrar Socio</h2>
@@ -489,7 +471,7 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
         </div>
     </div>
 
-    <!-- SCRIPT -->
+
     <script>
         function mostrarTab(tabId) {
             const tabs = ['socios', 'mantenimiento', 'ventas', 'empleados', 'reportes', 'visitas', 'reservas'];

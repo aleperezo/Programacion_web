@@ -14,10 +14,7 @@ if (!$res_usuario || $res_usuario->num_rows === 0) {
 
 $user = $res_usuario->fetch_assoc();
 $tipo_membresia = trim($user['tipo_membresia']); 
-
-// ==================================================
 // PROCESAR EL PAGO EN LÍNEA DEL USUARIO
-// ==================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['procesar_pago'])) {
     $concepto = "Pago Membresía " . $tipo_membresia . " (" . $user['nombre_completo'] . ")";
     $monto = 450.00;
@@ -28,10 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['procesar_pago'])) {
     echo "<script>alert('¡Pago procesado con éxito! Registrado en el sistema del administrador.'); window.location.href='panel.php';</script>";
     exit();
 }
-
-// ==================================================
-// PROCESAR EL APARTADO DE SALAS (NUEVO)
-// ==================================================
+// PROCESAR EL APARTADO DE SALAS
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apartar_sala'])) {
     $sala = $conn->real_escape_string(trim($_POST['sala']));
     $fecha_renta = $conn->real_escape_string(trim($_POST['fecha_renta']));
@@ -44,9 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apartar_sala'])) {
     }
 }
 
-// ==================================================
 // PROCESAR EL REPORTE ENVIADO POR EL USUARIO
-// ==================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['enviar_reporte'])) {
     $tipo_rep = $conn->real_escape_string(trim($_POST['tipo_reporte']));
     $desc_rep = $conn->real_escape_string(trim($_POST['descripcion_reporte']));
@@ -134,7 +126,7 @@ $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 space-y-16">
 
-        <!-- 1. SECCIÓN PERFIL Y FOTO -->
+        <!-- PERFIL Y FOTO -->
         <section id="perfil" class="bg-dark-800 rounded-2xl p-8 border border-dark-700 shadow-xl flex flex-col md:flex-row items-center justify-between gap-8">
             <div class="flex items-center gap-6 w-full md:w-auto">
                 <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-brand bg-dark-700 flex-shrink-0">
@@ -158,7 +150,7 @@ $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
             </div>
         </section>
 
-        <!-- 2. SECCIÓN MEMBRESÍA Y AVISO DE ESTADO -->
+        <!-- MEMBRESÍA -->
         <section id="membresia">
             <div class="flex items-center gap-3 mb-6">
                 <i class="fas fa-id-card text-3xl text-brand"></i>
@@ -214,7 +206,7 @@ $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
             </div>
         </section>
 
-        <!-- 3. SECCIÓN ASISTENCIA -->
+        <!--  ASISTENCIA -->
         <section id="asistencia">
             <div class="flex items-center gap-3 mb-6">
                 <i class="fas fa-calendar-check text-3xl text-brand"></i>
@@ -246,7 +238,7 @@ $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
             </div>
         </section>
 
-        <!-- 4. SECCIÓN VIP: APARTAR SALAS (CONECTADA) -->
+        <!-- SECCIÓN VIP, TIENE APARTAR SALAS -->
         <?php if ($tipo_membresia === 'VIP'): ?>
             <section id="apartar-salas" class="bg-gradient-to-r from-dark-800 to-dark-900 border border-brand/50 rounded-2xl p-8 shadow-2xl">
                 <div class="flex items-center gap-3 mb-4">
@@ -277,7 +269,7 @@ $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
             </section>
         <?php endif; ?>
 
-        <!-- 5. SECCIONES EXTENSAS DE RUTINA Y DIETA -->
+        <!-- RUTINA Y DIETA -->
         <?php if ($tipo_membresia === 'Premium' || $tipo_membresia === 'VIP'): ?>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <section id="rutina">
@@ -352,7 +344,7 @@ $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
             </div>
         <?php endif; ?>
 
-        <!-- 6. SECCIÓN DE AVISOS DE MANTENIMIENTO -->
+        <!-- AVISOS DE MANTENIMIENTO -->
         <section id="mantenimiento-aviso" class="bg-dark-800 border border-yellow-500/40 rounded-2xl p-8 shadow-xl mt-8">
             <div class="flex items-center gap-3 mb-4">
                 <i class="fas fa-tools text-3xl text-yellow-500"></i>
@@ -392,9 +384,9 @@ $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
 
     </main>
 
-    <!-- VENTANAS MODALES -->
+    <!-- VENTANAS -->
     
-    <!-- Modal: Pago en Línea -->
+    <!-- Pago en Línea -->
     <div id="modal-pago" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
         <div class="bg-dark-800 p-8 rounded-2xl w-full max-w-md border border-dark-700 shadow-2xl relative">
             <button onclick="cerrarModalPago()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl cursor-pointer"><i class="fas fa-times"></i></button>
@@ -430,7 +422,7 @@ $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
         </div>
     </div>
 
-    <!-- Modal: Facturación -->
+    <!-- Facturación -->
     <div id="modal-factura" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
         <div class="bg-dark-800 p-8 rounded-2xl w-full max-w-lg border border-dark-700 shadow-2xl relative">
             <button onclick="cerrarModalFactura()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl cursor-pointer"><i class="fas fa-times"></i></button>
@@ -469,7 +461,7 @@ $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
         </div>
     </div>
 
-    <!-- Modal: Renovación de Membresía -->
+    <!-- Renovación de Membresía -->
     <div id="modal-renovacion" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
         <div class="bg-dark-800 p-8 rounded-2xl w-full max-w-md border border-dark-700 text-center shadow-2xl relative">
             <button onclick="cerrarModalRenovacion()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl cursor-pointer"><i class="fas fa-times"></i></button>
@@ -484,7 +476,7 @@ $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
         </div>
     </div>
 
-    <!-- Modal: Reportar Fallas -->
+    <!-- Reportar Fallas -->
     <div id="modal-reporte" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
         <div class="bg-dark-800 p-8 rounded-2xl w-full max-w-md border border-dark-700 shadow-2xl relative">
             <button onclick="cerrarModalReporte()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl cursor-pointer">

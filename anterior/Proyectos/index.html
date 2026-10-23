@@ -1,4 +1,4 @@
-<!-- -- Active: 1790221583716@@127.0.0.1@3306@gymico_db -->
+<!-- Active: 1790221583716@@127.0.0.1@3306@gymico_db -->
 <!DOCTYPE html>
 <html lang="es" class="scroll-smooth">
 <head>
@@ -40,7 +40,6 @@
                 <div class="hidden md:flex space-x-8 items-center">
                     <a href="#inicio" class="text-gray-300 hover:text-brand transition font-semibold">Inicio</a>
                     <a href="#instalaciones" class="text-gray-300 hover:text-brand transition font-semibold">Instalaciones</a>
-                    <!-- Cambiado de "Nosotros" a "Contacto" apuntando al footer -->
                     <a href="#contacto" class="text-gray-300 hover:text-brand transition font-semibold">Contacto</a>
                     <button onclick="abrirModal('modal-membresias')" class="text-gray-300 hover:text-brand transition font-semibold cursor-pointer">Membresías</button>
                     <a href="sesiones.html" class="text-gray-300 hover:text-brand transition font-semibold">Inicia Sesión</a>
@@ -64,14 +63,14 @@
                 <a href="#contacto" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-brand">Contacto</a>
                 <button onclick="abrirModal('modal-membresias')" class="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-brand">Membresías</button>
                 <a href="sesiones.html" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-brand">Inicia Sesión</a>
-                <a href="agendar.html" class="block px-3 py-2 mt-4 text-center text-base font-bold text-white bg-brand rounded-md uppercase">Agenda Visita</a>
+                <a href="agendar.php" class="block px-3 py-2 mt-4 text-center text-base font-bold text-white bg-brand rounded-md uppercase">Agenda Visita</a>
             </div>
         </div>
     </nav>
 
     <section id="inicio" class="relative h-screen flex items-center justify-center">
         <div class="absolute inset-0 z-0">
-            <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop" class="w-full h-full object-cover" />
+            <img src="https://images.unsplash.com/photo-1623874514711-0f321325f318?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D" class="w-full h-full object-cover" />
             <div class="absolute inset-0 bg-gradient-to-r from-dark-900 via-dark-900/80 to-transparent"></div>
             <div class="absolute inset-0 bg-black/40"></div>
         </div>
@@ -86,7 +85,7 @@
                     Únete a GYMICO. Instalaciones de primer nivel, entrenadores expertos y una comunidad que te impulsará a alcanzar tu mejor versión.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                    <a href="agendar.html" class="bg-brand hover:bg-brand-dark text-white px-8 py-4 rounded-full font-bold uppercase tracking-wide transition transform hover:-translate-y-1 text-center">
+                    <a href="agendar.php" class="bg-brand hover:bg-brand-dark text-white px-8 py-4 rounded-full font-bold uppercase tracking-wide transition transform hover:-translate-y-1 text-center">
                         Agenda Visita
                     </a>
                     <a href="#instalaciones" class="border-2 border-white text-white hover:bg-white hover:text-dark-900 px-8 py-4 rounded-full font-bold uppercase tracking-wide transition transform hover:-translate-y-1 text-center">
@@ -129,14 +128,14 @@
                     </div>
                 </div>
 
-                <!-- 3. Zona de Estiramiento -->
+                <!-- 3. Zona de Cardio -->
                 <div class="group relative overflow-hidden rounded-xl shadow-lg h-80">
-                    <img src="https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?q=80&w=2070&auto=format&fit=crop" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    <img src="https://images.unsplash.com/photo-1593079831268-3381b0db4a77?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
                     <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/60 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
                     <div class="absolute bottom-0 left-0 p-6 w-full transform transition-transform duration-300 group-hover:-translate-y-2">
-                        <h3 class="font-heading text-2xl font-bold text-white uppercase mb-1">Zona de Estiramiento</h3>
-                        <p class="text-gray-300 text-sm mb-2">Tapetes profesionales, rodillos de espuma, barras de ballet y ligas de resistencia.</p>
-                        <button onclick="abrirModal('modal-estiramiento')" class="text-brand font-bold uppercase text-sm hover:text-white flex items-center gap-2 mt-2 cursor-pointer">Ver Catálogo <i class="fas fa-arrow-right"></i></button>
+                        <h3 class="font-heading text-2xl font-bold text-white uppercase mb-1">Zona de Cardio</h3>
+                        <p class="text-gray-300 text-sm mb-2">Tapetes profesionales, caminadoras, elípticas y escaladoras.</p>
+                        <button onclick="abrirModal('modal-cardio')" class="text-brand font-bold uppercase text-sm hover:text-white flex items-center gap-2 mt-2 cursor-pointer">Ver Catálogo <i class="fas fa-arrow-right"></i></button>
                     </div>
                 </div>
 
@@ -154,7 +153,7 @@
         </div>
     </section>
 
-    <!-- Footer / Sección Contacto (Hasta abajo) -->
+    <!-- Contacto) -->
     <footer id="contacto" class="bg-black pt-16 pb-8 border-t border-dark-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
@@ -171,7 +170,7 @@
                         <li><a href="#instalaciones" class="text-gray-400 hover:text-brand transition text-sm">Instalaciones</a></li>
                         <li><button onclick="abrirModal('modal-membresias')" class="text-gray-400 hover:text-brand transition text-sm text-left cursor-pointer">Membresías</button></li>
                         <li><a href="sesiones.html" class="text-gray-400 hover:text-brand transition text-sm">Inicia Sesión</a></li>
-                        <li><a href="agendar.html" class="text-gray-400 hover:text-brand transition text-sm">Agenda Visita</a></li>
+                        <li><a href="agendar.php" class="text-gray-400 hover:text-brand transition text-sm">Agenda Visita</a></li>
                     </ul>
                 </div>
                 <div>
@@ -220,18 +219,19 @@
         </div>
     </div>
 
-    <div id="modal-estiramiento" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
+    <!-- MODAL DE CARDIO CORREGIDO -->
+    <div id="modal-cardio" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
         <div class="bg-dark-800 p-8 rounded-2xl w-full max-w-2xl border border-dark-700 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="cerrarModal('modal-estiramiento')" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl cursor-pointer"><i class="fas fa-times"></i></button>
-            <h2 class="font-heading text-3xl font-bold text-white uppercase mb-2 text-center">Catálogo: <span class="text-brand">Zona de Estiramiento</span></h2>
-            <p class="text-gray-400 text-sm mb-6 text-center">Espacio dedicado a la flexibilidad y recuperación post-entreno.</p>
+            <button onclick="cerrarModal('modal-cardio')" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl cursor-pointer"><i class="fas fa-times"></i></button>
+            <h2 class="font-heading text-3xl font-bold text-white uppercase mb-2 text-center">Catálogo: <span class="text-brand">Zona de Cardio</span></h2>
+            <p class="text-gray-400 text-sm mb-6 text-center">Equipos de ejercicio cardiovascular para mejorar tu condición física.</p>
             <ul class="space-y-3 text-sm text-gray-300">
-                <li class="bg-dark-900 p-3 rounded-lg border border-dark-700 flex justify-between items-center"><span><i class="fas fa-square text-brand mr-2"></i> Tapetes Antiderrapantes Profesionales</span> <strong class="text-white">Disponibles</strong></li>
-                <li class="bg-dark-900 p-3 rounded-lg border border-dark-700 flex justify-between items-center"><span><i class="fas fa-grip-vertical text-brand mr-2"></i> Rodillos de Espuma (Foam Rollers)</span> <strong class="text-white">Varias Densidades</strong></li>
-                <li class="bg-dark-900 p-3 rounded-lg border border-dark-700 flex justify-between items-center"><span><i class="fas fa-bowling-ball text-brand mr-2"></i> Esferas de Pilates (Fitballs)</span> <strong class="text-white">Diferentes Medidas</strong></li>
-                <li class="bg-dark-900 p-3 rounded-lg border border-dark-700 flex justify-between items-center"><span><i class="fas fa-bars text-brand mr-2"></i> Barras de Ballet y Elásticas</span> <strong class="text-white">Zona Mural</strong></li>
+                <li class="bg-dark-900 p-3 rounded-lg border border-dark-700 flex justify-between items-center"><span><i class="fas fa-running text-brand mr-2"></i> Caminadoras de Alta Gama</span> <strong class="text-white">10 Unidades</strong></li>
+                <li class="bg-dark-900 p-3 rounded-lg border border-dark-700 flex justify-between items-center"><span><i class="fas fa-walking text-brand mr-2"></i> Elípticas Magnéticas</span> <strong class="text-white">8 Unidades</strong></li>
+                <li class="bg-dark-900 p-3 rounded-lg border border-dark-700 flex justify-between items-center"><span><i class="fas fa-shoe-prints text-brand mr-2"></i> Escaladoras (StairMaster)</span> <strong class="text-white">4 Unidades</strong></li>
+                <li class="bg-dark-900 p-3 rounded-lg border border-dark-700 flex justify-between items-center"><span><i class="fas fa-bicycle text-brand mr-2"></i> Bicicletas Estáticas (Spinning)</span> <strong class="text-white">6 Unidades</strong></li>
             </ul>
-            <div class="text-center mt-6"><button onclick="cerrarModal('modal-estiramiento')" class="bg-brand text-white px-6 py-2 rounded-lg font-bold text-sm cursor-pointer">Cerrar</button></div>
+            <div class="text-center mt-6"><button onclick="cerrarModal('modal-cardio')" class="bg-brand text-white px-6 py-2 rounded-lg font-bold text-sm cursor-pointer">Cerrar</button></div>
         </div>
     </div>
 

@@ -2,7 +2,7 @@
 header('Content-Type: application/json');
 require 'conexion.php';
 
-// Recibir los datos enviados por JavaScript
+// Recibir los datos enviados
 $data = json_decode(file_get_contents("php://input"), true);
 $id_usuario = intval($data['id_usuario']);
 
