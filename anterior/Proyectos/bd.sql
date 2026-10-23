@@ -55,3 +55,26 @@ CREATE TABLE IF NOT EXISTS reportes (
     reportado_por VARCHAR(100) NOT NULL,
     fecha_reporte TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS visitas (
+    id_visita INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_visitante VARCHAR(150) NOT NULL,
+    correo_visitante VARCHAR(150) NOT NULL,
+    telefono VARCHAR(20) DEFAULT NULL,
+    fecha_visita DATE NOT NULL,
+    hora_visita TIME NOT NULL,
+    motivo VARCHAR(100) DEFAULT 'Tour / Visita al Gym',
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+DROP TABLE IF EXISTS visitas;
+
+CREATE TABLE visitas (
+    id_visita INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_visitante VARCHAR(150) NOT NULL,
+    correo_visitante VARCHAR(150) NOT NULL,
+    telefono VARCHAR(20) NOT NULL,
+    fecha_visita DATE NOT NULL,
+    horario VARCHAR(50) NOT NULL,
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
