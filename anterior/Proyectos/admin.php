@@ -121,7 +121,7 @@ if (isset($_GET['resolver_reporte'])) {
 }
 
 // ==========================================
-// 5. VISITAS
+// 5. VISITAS Y RESERVAS
 // ==========================================
 if (isset($_GET['eliminar_visita'])) {
     $id_visita = intval($_GET['eliminar_visita']);
@@ -129,13 +129,20 @@ if (isset($_GET['eliminar_visita'])) {
     header("Location: admin.php?eliminado=visita");
     exit();
 }
+if (isset($_GET['eliminar_reserva'])) {
+    $id_res = intval($_GET['eliminar_reserva']);
+    $conn->query("DELETE FROM reservas_salas WHERE id_reserva = $id_res");
+    header("Location: admin.php?eliminado=reserva");
+    exit();
+}
 
-// Consultas
+// Consultas a BD
 $resultado_mantenimiento = $conn->query("SELECT * FROM mantenimiento ORDER BY id DESC");
 $resultado_ventas = $conn->query("SELECT * FROM ventas ORDER BY fecha_venta DESC");
 $resultado_empleados = $conn->query("SELECT * FROM empleados ORDER BY id_empleado DESC");
 $resultado_reportes = $conn->query("SELECT * FROM reportes ORDER BY fecha_reporte DESC");
 $resultado_visitas = $conn->query("SELECT * FROM visitas ORDER BY fecha_visita ASC");
+$resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_renta ASC");
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -155,10 +162,20 @@ $resultado_visitas = $conn->query("SELECT * FROM visitas ORDER BY fecha_visita A
 <body class="bg-dark-900 text-gray-200 font-sans antialiased p-8">
 
     <div class="max-w-7xl mx-auto">
-        <div class="flex justify-between items-center mb-6">
+        
+        <!-- HEADER PRINCIPAL CON BOTONES ALINEADOS -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <h1 class="font-heading text-4xl font-bold text-white uppercase"><span class="text-brand">Admin</span> GYMICO</h1>
-            <div class="flex gap-4">
-                <a href="escaner.html" class="bg-dark-800 border border-dark-700 hover:bg-dark-700 text-white px-4 py-2 rounded-lg font-bold transition flex items-center gap-2">
+            
+            <!-- Grupo de Botones Superiores -->
+            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <!-- Botón de Soporte Discreto -->
+                <a href="https://wa.me/525512345678?text=Hola,%20soy%20el%20administrador%20de%20GYMICO.%20Necesito%20reportar%20un%20error%20en%20el%20sistema." target="_blank" class="bg-dark-800 border border-green-500/50 hover:bg-green-900/40 text-green-400 px-4 py-2.5 rounded-lg font-bold transition flex items-center gap-2 shadow-lg justify-center text-sm">
+                    <i class="fab fa-whatsapp text-lg"></i> Soporte (+52 55 1234 5678)
+                </a>
+                
+                <!-- Botón Original de Recepción -->
+                <a href="escaner.html" class="bg-dark-800 border border-dark-700 hover:bg-dark-700 text-white px-4 py-2.5 rounded-lg font-bold transition flex items-center gap-2 shadow-lg justify-center text-sm">
                     <i class="fas fa-id-card text-brand"></i> Ir a Recepción
                 </a>
             </div>
@@ -172,12 +189,13 @@ $resultado_visitas = $conn->query("SELECT * FROM visitas ORDER BY fecha_visita A
             <button onclick="mostrarTab('empleados')" id="btn-empleados" class="text-gray-400 font-bold uppercase pb-2 border-b-2 border-transparent hover:text-white transition whitespace-nowrap">Empleados</button>
             <button onclick="mostrarTab('reportes')" id="btn-reportes" class="text-gray-400 font-bold uppercase pb-2 border-b-2 border-transparent hover:text-white transition whitespace-nowrap">Reportes</button>
             <button onclick="mostrarTab('visitas')" id="btn-visitas" class="text-gray-400 font-bold uppercase pb-2 border-b-2 border-transparent hover:text-white transition whitespace-nowrap">Visitas Agendadas</button>
+            <button onclick="mostrarTab('reservas')" id="btn-reservas" class="text-gray-400 font-bold uppercase pb-2 border-b-2 border-transparent hover:text-white transition whitespace-nowrap">Salas Reservadas</button>
         </div>
 
         <!-- TAB 1: SOCIOS -->
         <div id="tab-socios" class="block">
             <div class="flex justify-end mb-4">
-                <button onclick="abrirModal()" class="bg-brand hover:bg-red-700 text-white px-6 py-2 rounded-lg font-bold transition">
+                <button onclick="abrirModal()" class="bg-brand hover:bg-red-700 text-white px-6 py-2 rounded-lg font-bold transition shadow-lg">
                     <i class="fas fa-plus mr-2"></i> Nuevo Socio
                 </button>
             </div>
@@ -214,10 +232,9 @@ $resultado_visitas = $conn->query("SELECT * FROM visitas ORDER BY fecha_visita A
             </div>
         </div>
 
-        <!-- TAB 3: VENTAS (CON EDICIÓN Y ELIMINACIÓN) -->
+        <!-- TAB 3: VENTAS -->
         <div id="tab-ventas" class="hidden">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Formulario Ventas (Crear / Editar) -->
                 <div class="bg-dark-800 rounded-2xl p-6 border border-dark-700 shadow-xl">
                     <h3 id="titulo-form-venta" class="font-heading text-xl font-bold text-white uppercase mb-4">Registrar Venta</h3>
                     <form action="admin.php" method="POST" class="space-y-4">
@@ -242,7 +259,6 @@ $resultado_visitas = $conn->query("SELECT * FROM visitas ORDER BY fecha_visita A
                     </form>
                 </div>
 
-                <!-- Tabla Historial de Ventas -->
                 <div class="bg-dark-800 rounded-2xl p-6 border border-dark-700 shadow-xl md:col-span-2">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="font-heading text-xl font-bold text-white uppercase">Historial de Ventas</h3>
@@ -289,7 +305,18 @@ $resultado_visitas = $conn->query("SELECT * FROM visitas ORDER BY fecha_visita A
                     <form action="admin.php" method="POST" class="space-y-4">
                         <input type="hidden" name="id_empleado" id="form-emp-id" value="0">
                         <div><label class="block text-sm text-gray-400 mb-1">Nombre</label><input type="text" name="nombre_empleado" id="form-emp-nombre" required class="w-full bg-dark-900 border border-dark-700 text-white px-4 py-2.5 rounded-lg"></div>
-                        <div><label class="block text-sm text-gray-400 mb-1">Rol</label><select name="rol_empleado" id="form-emp-rol" class="w-full bg-dark-900 border border-dark-700 text-white px-4 py-2.5 rounded-lg"><option value="Entrenador">Entrenador</option><option value="Recepcionista">Recepcionista</option><option value="Nutriologo">Nutriólogo</option><option value="Gerente">Gerente</option></select></div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">Rol</label>
+                            <select name="rol_empleado" id="form-emp-rol" class="w-full bg-dark-900 border border-dark-700 text-white px-4 py-2.5 rounded-lg">
+                                <option value="Entrenador">Entrenador</option>
+                                <option value="Recepcionista">Recepcionista</option>
+                                <option value="Nutriologo">Nutriólogo</option>
+                                <option value="Gerente">Gerente</option>
+                                <option value="Personal de Limpieza">Personal de Limpieza</option>
+                                <option value="Mantenimiento">Mantenimiento</option>
+                                <option value="Seguridad">Seguridad</option>
+                            </select>
+                        </div>
                         <button type="submit" name="guardar_empleado" id="btn-guardar-emp" class="w-full bg-blue-600 text-white font-bold py-2.5 rounded-lg">Registrar</button>
                         <button type="button" onclick="limpiarFormEmpleado()" class="w-full bg-dark-700 text-gray-300 font-bold py-2 rounded-lg text-xs mt-2">Limpiar</button>
                     </form>
@@ -388,6 +415,52 @@ $resultado_visitas = $conn->query("SELECT * FROM visitas ORDER BY fecha_visita A
             </div>
         </div>
 
+        <!-- TAB 7: RESERVAS DE SALAS -->
+        <div id="tab-reservas" class="hidden">
+            <div class="bg-dark-800 rounded-2xl p-8 border border-dark-700 shadow-xl">
+                <div class="flex items-center gap-3 mb-6">
+                    <i class="fas fa-door-open text-3xl text-brand"></i>
+                    <h2 class="font-heading text-2xl font-bold text-white uppercase">Salas <span class="text-brand">Reservadas (VIP)</span></h2>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-dark-900 text-gray-400 text-xs uppercase border-b border-dark-700">
+                                <th class="p-3">ID</th>
+                                <th class="p-3">Socio VIP</th>
+                                <th class="p-3">Sala Solicitada</th>
+                                <th class="p-3">Fecha de Renta</th>
+                                <th class="p-3 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-dark-700 text-sm">
+                            <?php if ($resultado_reservas && $resultado_reservas->num_rows > 0): ?>
+                                <?php while($res = $resultado_reservas->fetch_assoc()): ?>
+                                    <tr class="hover:bg-dark-900/50 transition">
+                                        <td class="p-3 font-mono text-gray-400">#<?php echo $res['id_reserva']; ?></td>
+                                        <td class="p-3 font-bold text-white"><?php echo htmlspecialchars($res['nombre_usuario']); ?> <br><span class="text-xs text-gray-500">ID: GYM-<?php echo str_pad($res['id_usuario'], 4, '0', STR_PAD_LEFT); ?></span></td>
+                                        <td class="p-3 text-gray-300 font-semibold"><?php echo htmlspecialchars($res['sala']); ?></td>
+                                        <td class="p-3 text-brand font-bold"><?php echo date("d M Y", strtotime($res['fecha_renta'])); ?></td>
+                                        <td class="p-3 text-center">
+                                            <a href="admin.php?eliminar_reserva=<?php echo $res['id_reserva']; ?>" onclick="return confirm('¿Marcar la sala como usada/atendida y eliminar de la lista?');" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded text-xs font-bold uppercase transition inline-flex items-center gap-1 shadow">
+                                                <i class="fas fa-check"></i> Atendida
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="5" class="p-6 text-center text-gray-400">
+                                        No hay reservas de salas por el momento.
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Modal Formulario Socios -->
@@ -419,7 +492,7 @@ $resultado_visitas = $conn->query("SELECT * FROM visitas ORDER BY fecha_visita A
     <!-- SCRIPT -->
     <script>
         function mostrarTab(tabId) {
-            const tabs = ['socios', 'mantenimiento', 'ventas', 'empleados', 'reportes', 'visitas'];
+            const tabs = ['socios', 'mantenimiento', 'ventas', 'empleados', 'reportes', 'visitas', 'reservas'];
             tabs.forEach(t => {
                 document.getElementById('tab-' + t).classList.replace('block', 'hidden');
                 document.getElementById('btn-' + t).className = "text-gray-400 font-bold uppercase pb-2 border-b-2 border-transparent hover:text-white transition whitespace-nowrap";

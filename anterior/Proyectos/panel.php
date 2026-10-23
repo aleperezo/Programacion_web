@@ -13,7 +13,36 @@ if (!$res_usuario || $res_usuario->num_rows === 0) {
 }
 
 $user = $res_usuario->fetch_assoc();
-$tipo_membresia = trim($user['tipo_membresia']); // "Basica", "Premium", o "VIP"
+$tipo_membresia = trim($user['tipo_membresia']); 
+
+// ==================================================
+// PROCESAR EL PAGO EN LÍNEA DEL USUARIO
+// ==================================================
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['procesar_pago'])) {
+    $concepto = "Pago Membresía " . $tipo_membresia . " (" . $user['nombre_completo'] . ")";
+    $monto = 450.00;
+    
+    $conn->query("INSERT INTO ventas (concepto, monto) VALUES ('$concepto', $monto)");
+    $conn->query("UPDATE usuarios SET fecha_vencimiento = DATE_ADD(IFNULL(fecha_vencimiento, CURRENT_DATE), INTERVAL 30 DAY), estado = 'Pagado' WHERE id_usuario = $id_usuario");
+    
+    echo "<script>alert('¡Pago procesado con éxito! Registrado en el sistema del administrador.'); window.location.href='panel.php';</script>";
+    exit();
+}
+
+// ==================================================
+// PROCESAR EL APARTADO DE SALAS (NUEVO)
+// ==================================================
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apartar_sala'])) {
+    $sala = $conn->real_escape_string(trim($_POST['sala']));
+    $fecha_renta = $conn->real_escape_string(trim($_POST['fecha_renta']));
+    $nombre_socio = $conn->real_escape_string($user['nombre_completo']);
+    
+    if (!empty($sala) && !empty($fecha_renta)) {
+        $conn->query("INSERT INTO reservas_salas (id_usuario, nombre_usuario, sala, fecha_renta) VALUES ($id_usuario, '$nombre_socio', '$sala', '$fecha_renta')");
+        echo "<script>alert('¡Sala apartada con éxito! Nos comunicaremos contigo para confirmar el horario.'); window.location.href='panel.php';</script>";
+        exit();
+    }
+}
 
 // ==================================================
 // PROCESAR EL REPORTE ENVIADO POR EL USUARIO
@@ -21,8 +50,6 @@ $tipo_membresia = trim($user['tipo_membresia']); // "Basica", "Premium", o "VIP"
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['enviar_reporte'])) {
     $tipo_rep = $conn->real_escape_string(trim($_POST['tipo_reporte']));
     $desc_rep = $conn->real_escape_string(trim($_POST['descripcion_reporte']));
-    
-    // Identificamos automáticamente al usuario que lo reporta
     $autor_rep = $conn->real_escape_string($user['nombre_completo'] . ' (ID: GYM-' . str_pad($user['id_usuario'], 4, '0', STR_PAD_LEFT) . ')');
 
     if (!empty($desc_rep)) {
@@ -35,7 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['enviar_reporte'])) {
 $sql_asistencias = "SELECT fecha_hora FROM asistencias WHERE id_usuario = $id_usuario ORDER BY fecha_hora DESC LIMIT 5";
 $res_asistencias = $conn->query($sql_asistencias);
 
-// Cálculo para saber si la membresía está por vencer o activa
 $fecha_vencimiento = !empty($user['fecha_vencimiento']) ? $user['fecha_vencimiento'] : date('Y-m-d');
 $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
 ?>
@@ -94,7 +120,6 @@ $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
                         <a href="#apartar-salas" class="text-brand hover:text-red-400 transition text-sm font-bold"><i class="fas fa-door-open mr-1"></i> Renta Salas</a>
                     <?php endif; ?>
 
-                    <!-- BOTÓN PARA REPORTAR -->
                     <button onclick="abrirModalReporte()" class="text-yellow-500 hover:text-yellow-400 transition text-sm font-bold ml-2 cursor-pointer">
                         <i class="fas fa-exclamation-triangle mr-1"></i> Reportar Falla
                     </button>
@@ -141,41 +166,49 @@ $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Detalles de la membresía -->
-                <div class="bg-dark-800 p-6 rounded-xl border border-dark-700 md:col-span-2 flex flex-col justify-center shadow-xl">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <span class="text-xs text-brand font-bold uppercase tracking-wider bg-brand/10 px-2 py-1 rounded">Plan Actual</span>
-                            <h3 class="text-2xl font-bold text-white mt-2">Membresía <?php echo htmlspecialchars($tipo_membresia); ?></h3>
+                <div class="bg-dark-800 p-6 rounded-xl border border-dark-700 md:col-span-2 flex flex-col justify-between shadow-xl">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <span class="text-xs text-brand font-bold uppercase tracking-wider bg-brand/10 px-2 py-1 rounded">Plan Actual</span>
+                                <h3 class="text-2xl font-bold text-white mt-2">Membresía <?php echo htmlspecialchars($tipo_membresia); ?></h3>
+                            </div>
+                            <span class="bg-green-500/20 text-green-500 px-3 py-1 rounded-full text-sm font-bold border border-green-500/50"><?php echo htmlspecialchars($user['estado'] ?? 'Activo'); ?></span>
                         </div>
-                        <span class="bg-green-500/20 text-green-500 px-3 py-1 rounded-full text-sm font-bold border border-green-500/50"><?php echo htmlspecialchars($user['estado'] ?? 'Activo'); ?></span>
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            <div class="bg-dark-900 p-4 rounded-lg border border-dark-700">
+                                <p class="text-gray-400 text-sm mb-1">Fecha de Registro</p>
+                                <p class="text-lg font-bold text-white"><?php echo !empty($user['fecha_registro']) ? date("d M Y", strtotime($user['fecha_registro'])) : 'Reciente'; ?></p>
+                            </div>
+                            <div class="bg-dark-900 p-4 rounded-lg border border-dark-700">
+                                <p class="text-gray-400 text-sm mb-1">Fecha de Expiración</p>
+                                <p class="text-lg font-bold text-white"><?php echo htmlspecialchars($user['fecha_vencimiento'] ?? 'No definida'); ?></p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4 mt-4">
-                        <div class="bg-dark-900 p-4 rounded-lg border border-dark-700">
-                            <p class="text-gray-400 text-sm mb-1">Fecha de Registro</p>
-                            <p class="text-lg font-bold text-white"><?php echo !empty($user['fecha_registro']) ? date("d M Y", strtotime($user['fecha_registro'])) : 'Reciente'; ?></p>
-                        </div>
-                        <div class="bg-dark-900 p-4 rounded-lg border border-dark-700">
-                            <p class="text-gray-400 text-sm mb-1">Fecha de Expiración</p>
-                            <p class="text-lg font-bold text-white"><?php echo htmlspecialchars($user['fecha_vencimiento'] ?? 'No definida'); ?></p>
-                        </div>
+                    <div class="mt-6 pt-4 border-t border-dark-700 flex flex-wrap justify-end gap-3">
+                        <button onclick="abrirModalFactura()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-bold text-sm transition shadow-lg flex items-center gap-2 cursor-pointer">
+                            <i class="fas fa-file-invoice-dollar"></i> Facturación
+                        </button>
+                        <button onclick="abrirModalPago()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg font-bold text-sm transition shadow-lg shadow-emerald-600/20 cursor-pointer flex items-center gap-2">
+                            <i class="fas fa-credit-card"></i> Pagar / Renovar en Línea
+                        </button>
                     </div>
                 </div>
 
-                <!-- Tarjeta de Aviso (Verde / Rojo) que querías de vuelta -->
                 <?php if ($dias_restantes > 5): ?>
                     <div class="bg-emerald-900/20 p-6 rounded-xl border border-emerald-500/50 flex flex-col items-center justify-center text-center shadow-xl">
                         <i class="fas fa-dumbbell text-4xl text-emerald-500 mb-4 animate-bounce"></i>
                         <h4 class="font-bold text-white mb-2 text-lg">¡Disfruta tu entrenamiento!</h4>
                         <p class="text-sm text-gray-300 mb-4">Tu membresía está activa y al corriente. ¡Aprovecha al máximo cada sesión en GYMICO!</p>
-                        <button onclick="abrirModalRenovacion()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg font-bold text-sm transition shadow-lg shadow-emerald-600/20 cursor-pointer">Renovar Plan</button>
+                        <button onclick="abrirModalRenovacion()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg font-bold text-sm transition shadow-lg shadow-emerald-600/20 cursor-pointer">Ver Detalles</button>
                     </div>
                 <?php else: ?>
                     <div class="bg-red-900/20 p-6 rounded-xl border border-red-500/50 flex flex-col items-center justify-center text-center shadow-xl">
                         <i class="fas fa-exclamation-triangle text-4xl text-brand mb-4 animate-pulse"></i>
                         <h4 class="font-bold text-white mb-2 text-lg">¡Expiración Próxima!</h4>
-                        <p class="text-sm text-gray-300 mb-4">Verifica tu fecha de corte. Acércate a recepción para renovar y no perder tu racha.</p>
-                        <button onclick="abrirModalRenovacion()" class="bg-brand hover:bg-brand-dark text-white px-6 py-2 rounded-lg font-bold text-sm transition shadow-lg shadow-brand/20 cursor-pointer">Renovar ahora</button>
+                        <p class="text-sm text-gray-300 mb-4">Verifica tu fecha de corte. Realiza tu pago en línea para no perder tu racha.</p>
+                        <button onclick="abrirModalPago()" class="bg-brand hover:bg-brand-dark text-white px-6 py-2 rounded-lg font-bold text-sm transition shadow-lg shadow-brand/20 cursor-pointer">Pagar Ahora</button>
                     </div>
                 <?php endif; ?>
             </div>
@@ -213,7 +246,7 @@ $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
             </div>
         </section>
 
-        <!-- 4. SECCIÓN VIP: APARTAR SALAS -->
+        <!-- 4. SECCIÓN VIP: APARTAR SALAS (CONECTADA) -->
         <?php if ($tipo_membresia === 'VIP'): ?>
             <section id="apartar-salas" class="bg-gradient-to-r from-dark-800 to-dark-900 border border-brand/50 rounded-2xl p-8 shadow-2xl">
                 <div class="flex items-center gap-3 mb-4">
@@ -222,21 +255,21 @@ $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
                 </div>
                 <p class="text-gray-300 text-sm mb-6">Como socio <strong>VIP</strong>, tienes derecho a reservar nuestras salas multiusos para entrenamientos privados o sesiones especiales.</p>
                 
-                <form onsubmit="event.preventDefault(); alert('¡Sala apartada con éxito! Nos comunicaremos contigo para confirmar el horario.');" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <form action="panel.php" method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-sm text-gray-400 mb-1">Seleccionar Sala</label>
-                        <select class="w-full bg-dark-900 border border-dark-700 text-white px-4 py-2.5 rounded-lg outline-none focus:border-brand text-sm">
-                            <option>Sala Multiusos A (Espejos y Audio)</option>
-                            <option>Sala B (Piso Amortiguado)</option>
-                            <option>Estudio Privado de Cardio</option>
+                        <select name="sala" required class="w-full bg-dark-900 border border-dark-700 text-white px-4 py-2.5 rounded-lg outline-none focus:border-brand text-sm">
+                            <option value="Sala Multiusos A (Espejos y Audio)">Sala Multiusos A (Espejos y Audio)</option>
+                            <option value="Sala B (Piso Amortiguado)">Sala B (Piso Amortiguado)</option>
+                            <option value="Estudio Privado de Cardio">Estudio Privado de Cardio</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-sm text-gray-400 mb-1">Fecha de Renta</label>
-                        <input type="date" required class="w-full bg-dark-900 border border-dark-700 text-gray-300 px-4 py-2.5 rounded-lg text-sm" style="color-scheme: dark;">
+                        <input type="date" name="fecha_renta" required min="<?php echo date('Y-m-d'); ?>" class="w-full bg-dark-900 border border-dark-700 text-gray-300 px-4 py-2.5 rounded-lg text-sm" style="color-scheme: dark;">
                     </div>
                     <div class="flex items-end">
-                        <button type="submit" class="w-full bg-brand hover:bg-brand-dark text-white font-bold py-2.5 rounded-lg uppercase tracking-wide transition text-sm shadow-lg shadow-brand/20 cursor-pointer">
+                        <button type="submit" name="apartar_sala" class="w-full bg-brand hover:bg-brand-dark text-white font-bold py-2.5 rounded-lg uppercase tracking-wide transition text-sm shadow-lg shadow-brand/20 cursor-pointer">
                             Confirmar Apartado
                         </button>
                     </div>
@@ -319,7 +352,7 @@ $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
             </div>
         <?php endif; ?>
 
-        <!-- 6. SECCIÓN DE AVISOS DE MANTENIMIENTO (VISIBLE PARA TODOS) -->
+        <!-- 6. SECCIÓN DE AVISOS DE MANTENIMIENTO -->
         <section id="mantenimiento-aviso" class="bg-dark-800 border border-yellow-500/40 rounded-2xl p-8 shadow-xl mt-8">
             <div class="flex items-center gap-3 mb-4">
                 <i class="fas fa-tools text-3xl text-yellow-500"></i>
@@ -330,8 +363,8 @@ $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
                 <?php
                 $sql_mant = "SELECT * FROM mantenimiento";
                 $res_mant = $conn->query($sql_mant);
-                if ($res_mant && $res_mant->num_rows > 0):
-                    while($item = $res_mant->fetch_assoc()):
+                if ($res_mant &&$res_mant->num_rows > 0):
+                    while($item =$res_mant->fetch_assoc()):
                 ?>
                     <div class="bg-dark-900 border border-red-500/30 rounded-xl p-4 flex flex-col justify-between relative overflow-hidden">
                         <div class="absolute top-0 right-0 bg-red-600 text-white text-[10px] font-bold px-3 py-0.5 uppercase tracking-wider rounded-bl-lg">
@@ -361,6 +394,81 @@ $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
 
     <!-- VENTANAS MODALES -->
     
+    <!-- Modal: Pago en Línea -->
+    <div id="modal-pago" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
+        <div class="bg-dark-800 p-8 rounded-2xl w-full max-w-md border border-dark-700 shadow-2xl relative">
+            <button onclick="cerrarModalPago()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl cursor-pointer"><i class="fas fa-times"></i></button>
+            <div class="w-16 h-16 bg-emerald-500/20 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fas fa-credit-card"></i>
+            </div>
+            <h3 class="font-heading text-2xl font-bold text-white uppercase mb-2 text-center">Pasarela de Pago GYMICO</h3>
+            <p class="text-gray-300 text-sm mb-6 text-center">Renueva tu membresía <strong><?php echo htmlspecialchars($tipo_membresia); ?></strong>. Se registrará en el sistema.</p>
+            
+            <form action="panel.php" method="POST" class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Nombre en la Tarjeta</label>
+                    <input type="text" required placeholder="Ej. Juan Pérez" class="w-full bg-dark-900 border border-dark-700 text-white px-4 py-2.5 rounded-lg outline-none focus:border-emerald-500 text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Número de Tarjeta</label>
+                    <input type="text" required placeholder="XXXX XXXX XXXX XXXX" maxlength="19" class="w-full bg-dark-900 border border-dark-700 text-white px-4 py-2.5 rounded-lg outline-none focus:border-emerald-500 text-sm">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-1">Expiración</label>
+                        <input type="text" required placeholder="MM/AA" maxlength="5" class="w-full bg-dark-900 border border-dark-700 text-white px-4 py-2.5 rounded-lg outline-none focus:border-emerald-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-1">CVV</label>
+                        <input type="password" required placeholder="123" maxlength="4" class="w-full bg-dark-900 border border-dark-700 text-white px-4 py-2.5 rounded-lg outline-none focus:border-emerald-500 text-sm">
+                    </div>
+                </div>
+                <button type="submit" name="procesar_pago" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg transition uppercase tracking-wide cursor-pointer shadow-lg shadow-emerald-600/20 mt-4">
+                    Pagar $450.00 MXN
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Facturación -->
+    <div id="modal-factura" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
+        <div class="bg-dark-800 p-8 rounded-2xl w-full max-w-lg border border-dark-700 shadow-2xl relative">
+            <button onclick="cerrarModalFactura()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl cursor-pointer"><i class="fas fa-times"></i></button>
+            <div class="flex items-center gap-3 mb-4">
+                <i class="fas fa-file-invoice text-3xl text-blue-500"></i>
+                <h3 class="font-heading text-2xl font-bold text-white uppercase">Comprobante de Facturación</h3>
+            </div>
+            <p class="text-gray-400 text-sm mb-6">Detalle de tu comprobante fiscal digital simulado por tu membresía.</p>
+            
+            <div class="bg-dark-900 p-6 rounded-xl border border-dark-700 space-y-4 mb-6 text-sm">
+                <div class="flex justify-between border-b border-dark-700 pb-2">
+                    <span class="text-gray-400">Emisor:</span>
+                    <span class="font-bold text-white">GYMICO Central S.A. de C.V.</span>
+                </div>
+                <div class="flex justify-between border-b border-dark-700 pb-2">
+                    <span class="text-gray-400">RFC Emisor:</span>
+                    <span class="font-mono text-white">GYM261023XYZ</span>
+                </div>
+                <div class="flex justify-between border-b border-dark-700 pb-2">
+                    <span class="text-gray-400">Receptor:</span>
+                    <span class="font-bold text-white"><?php echo htmlspecialchars($user['nombre_completo']); ?></span>
+                </div>
+                <div class="flex justify-between border-b border-dark-700 pb-2">
+                    <span class="text-gray-400">Concepto:</span>
+                    <span class="text-white">Membresía <?php echo htmlspecialchars($tipo_membresia); ?> (30 Días)</span>
+                </div>
+                <div class="flex justify-between text-base font-bold pt-2">
+                    <span class="text-white">Total Pagado:</span>
+                    <span class="text-emerald-400">$450.00 MXN</span>
+                </div>
+            </div>
+
+            <button onclick="alert('¡Factura descargada en formato PDF con éxito!'); cerrarModalFactura();" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition uppercase tracking-wide cursor-pointer shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2">
+                <i class="fas fa-download"></i> Descargar Factura (PDF)
+            </button>
+        </div>
+    </div>
+
     <!-- Modal: Renovación de Membresía -->
     <div id="modal-renovacion" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
         <div class="bg-dark-800 p-8 rounded-2xl w-full max-w-md border border-dark-700 text-center shadow-2xl relative">
@@ -368,8 +476,8 @@ $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
             <div class="w-16 h-16 bg-brand/20 text-brand rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
                 <i class="fas fa-user-tie"></i>
             </div>
-            <h3 class="font-heading text-2xl font-bold text-white uppercase mb-2">Renovación de Membresía</h3>
-            <p class="text-gray-300 text-sm mb-6">Para renovar o cambiar tu plan, por favor <strong>acércate directamente a la recepción</strong> del gimnasio con el personal encargado. ¡Te atenderemos con gusto!</p>
+            <h3 class="font-heading text-2xl font-bold text-white uppercase mb-2">Información de Membresía</h3>
+            <p class="text-gray-300 text-sm mb-6">Tu membresía se encuentra en regla. Puedes realizar pagos en línea cuando gustes o acudir a recepción.</p>
             <button onclick="cerrarModalRenovacion()" class="w-full bg-brand hover:bg-brand-dark text-white font-bold py-3 rounded-lg transition uppercase tracking-wide cursor-pointer">
                 Entendido
             </button>
@@ -408,23 +516,15 @@ $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
         </div>
     </div>
 
-    <!-- Scripts -->
     <script>
-        // Modal de Renovación
-        function abrirModalRenovacion() {
-            document.getElementById('modal-renovacion').classList.replace('hidden', 'flex');
-        }
-        function cerrarModalRenovacion() {
-            document.getElementById('modal-renovacion').classList.replace('flex', 'hidden');
-        }
-
-        // Modal de reportes
-        function abrirModalReporte() {
-            document.getElementById('modal-reporte').classList.replace('hidden', 'flex');
-        }
-        function cerrarModalReporte() {
-            document.getElementById('modal-reporte').classList.replace('flex', 'hidden');
-        }
+        function abrirModalPago() { document.getElementById('modal-pago').classList.replace('hidden', 'flex'); }
+        function cerrarModalPago() { document.getElementById('modal-pago').classList.replace('flex', 'hidden'); }
+        function abrirModalFactura() { document.getElementById('modal-factura').classList.replace('hidden', 'flex'); }
+        function cerrarModalFactura() { document.getElementById('modal-factura').classList.replace('flex', 'hidden'); }
+        function abrirModalRenovacion() { document.getElementById('modal-renovacion').classList.replace('hidden', 'flex'); }
+        function cerrarModalRenovacion() { document.getElementById('modal-renovacion').classList.replace('flex', 'hidden'); }
+        function abrirModalReporte() { document.getElementById('modal-reporte').classList.replace('hidden', 'flex'); }
+        function cerrarModalReporte() { document.getElementById('modal-reporte').classList.replace('flex', 'hidden'); }
     </script>
 </body>
 </html>

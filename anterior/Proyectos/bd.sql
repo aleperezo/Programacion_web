@@ -78,3 +78,12 @@ CREATE TABLE visitas (
     horario VARCHAR(50) NOT NULL,
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS reservas_salas (
+    id_reserva INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    nombre_usuario VARCHAR(150) NOT NULL,
+    sala VARCHAR(100) NOT NULL,
+    fecha_renta DATE NOT NULL,
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

@@ -1,13 +1,16 @@
--- Active: 1790221583716@@127.0.0.1@3306@gymico_db
 <?php
-header('Content-Type: application/json');
+error_reporting(0);
+ini_set('display_errors', 0);
+
+header('Content-Type: application/json; charset=utf-8');
 require 'conexion.php';
 
-$data = json_decode(file_get_contents("php://input"), true);
-$id_usuario = intval($data['id_usuario']);
-$codigo_ingresado = trim($data['codigo'] ?? '');
+$input = file_get_contents("php://input");
+$data = json_decode($input, true);
 
-// Código diario requerido en recepción
+$id_usuario = isset($data['id_usuario']) ? intval($data['id_usuario']) : 0;
+$codigo_ingresado = isset($data['codigo']) ? trim($data['codigo']) : '';
+
 $codigo_del_dia = "GYM2026"; 
 
 if ($codigo_ingresado !== $codigo_del_dia) {
@@ -15,8 +18,13 @@ if ($codigo_ingresado !== $codigo_del_dia) {
     exit;
 }
 
-// Buscar al socio en la base de datos
-$sql = "SELECT id_usuario, nombre_completo, tipo_membresia, foto FROM usuarios WHERE id_usuario = $id_usuario";
+if ($id_usuario <= 0) {
+    echo json_encode(['success' => false, 'mensaje' => 'Por favor, ingresa un ID de socio válido.']);
+    exit;
+}
+
+// Consultar datos y fecha de vencimiento del usuario
+$sql = "SELECT id_usuario, nombre_completo, tipo_membresia, foto, fecha_vencimiento FROM usuarios WHERE id_usuario = $id_usuario";
 $resultado = $conn->query($sql);
 
 if ($resultado && $resultado->num_rows > 0) {
@@ -24,16 +32,25 @@ if ($resultado && $resultado->num_rows > 0) {
     
     $foto_url = !empty($socio['foto']) ? $socio['foto'] : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=500&auto=format&fit=crop';
 
+    // Validar si la membresía está activa (fecha de vencimiento mayor o igual a hoy)
+    $hoy = date('Y-m-d');
+    $vencimiento = $socio['fecha_vencimiento'] ? $socio['fecha_vencimiento'] : $hoy;
+    $activa = ($vencimiento >= $hoy);
+
     echo json_encode([
         'success' => true,
-        'id' => $socio['id_usuario'],
+        'id' => intval($socio['id_usuario']),
         'nombre' => $socio['nombre_completo'],
         'membresia' => $socio['tipo_membresia'],
-        'foto' => $foto_url
+        'foto' => $foto_url,
+        'activa' => $activa,
+        'vencimiento' => $vencimiento
     ]);
 } else {
-    echo json_encode(['success' => false, 'mensaje' => 'El ID de socio no existe.']);
+    echo json_encode(['success' => false, 'mensaje' => 'El ID de socio no existe en el sistema.']);
 }
 
-$conn->close();
+if (isset($conn) && $conn) {
+    $conn->close();
+}
 ?>
