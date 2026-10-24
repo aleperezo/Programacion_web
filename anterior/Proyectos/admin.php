@@ -1,6 +1,81 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+session_start();
+
+// ==========================================
+// SEGURIDAD: CONTRASEÑA FIJA DEL ADMINISTRADOR
+// ==========================================
+$password_fija = "gymico2026"; // <-- ¡AQUÍ PUEDES CAMBIAR TU CONTRASEÑA!
+
+// Procesar el login
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_admin'])) {
+    if ($_POST['password_admin'] === $password_fija) {
+        $_SESSION['admin_autorizado'] = true;
+    } else {
+        $error_login = "Contraseña incorrecta. Acceso denegado.";
+    }
+}
+
+// Procesar el cierre de sesión
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header("Location: index.html");
+    exit();
+}
+
+// Si NO está autorizado, mostrar la pantalla de bloqueo y detener el resto del código
+if (!isset($_SESSION['admin_autorizado']) || $_SESSION['admin_autorizado'] !== true) {
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Restringido | Admin GYMICO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = { theme: { extend: { colors: { brand: '#dc2626', dark: { 900: '#111827', 800: '#1f2937' } }, fontFamily: { heading: ['Oswald'] } } } }
+    </script>
+</head>
+<body class="bg-dark-900 h-screen flex items-center justify-center p-4 relative">
+    <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover opacity-20">
+    <div class="bg-dark-800/90 backdrop-blur-md p-8 rounded-2xl border border-brand/50 shadow-2xl shadow-brand/20 max-w-sm w-full text-center relative z-10">
+        <div class="w-16 h-16 bg-brand/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-brand/50">
+            <i class="fas fa-user-shield text-brand text-2xl"></i>
+        </div>
+        <h2 class="font-heading text-3xl font-bold text-white uppercase mb-2">Solo Personal</h2>
+        <p class="text-gray-400 text-sm mb-6">Ingresa la contraseña maestra para continuar.</p>
+        
+        <?php if(isset($error_login)): ?>
+            <div class="bg-red-900/50 border border-red-500 text-white text-xs py-2 px-3 rounded mb-4">
+                <i class="fas fa-exclamation-circle mr-1"></i> <?php echo $error_login; ?>
+            </div>
+        <?php endif; ?>
+
+        <form method="POST" class="space-y-4">
+            <input type="password" name="password_admin" placeholder="Contraseña..." required autofocus class="w-full bg-dark-900 border border-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-brand text-center tracking-widest">
+            <button type="submit" name="login_admin" class="w-full bg-brand hover:bg-red-700 text-white font-bold py-3 rounded-lg transition uppercase tracking-wide">Desbloquear Panel</button>
+        </form>
+        <a href="index.html" class="block mt-6 text-gray-500 text-xs hover:text-white transition"><i class="fas fa-arrow-left mr-1"></i> Volver al inicio</a>
+    </div>
+</body>
+</html>
+<?php
+    exit(); // ¡Súper importante! Esto evita que cargue el resto del panel si no tienen la contraseña.
+}
+
+// ==========================================
+// --- AQUÍ EMPIEZA TU CÓDIGO ORIGINAL ---
+// ==========================================
 require 'conexion.php';
+
+// ==========================================
 // LÓGICA PARA EXPORTAR A EXCEL
+// ==========================================
 if (isset($_GET['exportar']) && $_GET['exportar'] === 'excel') {
     header("Content-Type: application/vnd.ms-excel; charset=utf-8");
     header("Content-Disposition: attachment; filename=Reporte_Ventas_GYMICO.xls");
@@ -24,7 +99,10 @@ if (isset($_GET['exportar']) && $_GET['exportar'] === 'excel') {
     echo "</table>";
     exit();
 }
-// MANTENIMIENTO
+
+// ==========================================
+// 1. MANTENIMIENTO
+// ==========================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registrar_mantenimiento'])) {
     $nombre_equipo = $conn->real_escape_string(trim($_POST['nombre_equipo']));
     $tipo = $conn->real_escape_string(trim($_POST['tipo']));
@@ -42,7 +120,10 @@ if (isset($_GET['resolver'])) {
     header("Location: admin.php?resuelto=1");
     exit();
 }
-// VENTAS (CREAR, EDITAR Y ELIMINAR)
+
+// ==========================================
+// 2. VENTAS (CREAR, EDITAR Y ELIMINAR)
+// ==========================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['guardar_venta'])) {
     $id_venta = isset($_POST['id_venta']) ? intval($_POST['id_venta']) : 0;
     $concepto = $conn->real_escape_string(trim($_POST['concepto']));
@@ -64,7 +145,10 @@ if (isset($_GET['eliminar_venta'])) {
     header("Location: admin.php?eliminado=venta");
     exit();
 }
-// EMPLEADOS
+
+// ==========================================
+// 3. EMPLEADOS
+// ==========================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['guardar_empleado'])) {
     $id_emp = isset($_POST['id_empleado']) ? intval($_POST['id_empleado']) : 0;
     $nombre_emp = $conn->real_escape_string(trim($_POST['nombre_empleado']));
@@ -86,7 +170,10 @@ if (isset($_GET['eliminar_empleado'])) {
     header("Location: admin.php?eliminado=empleado");
     exit();
 }
-// REPORTES
+
+// ==========================================
+// 4. REPORTES
+// ==========================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registrar_reporte'])) {
     $tipo_rep = $conn->real_escape_string(trim($_POST['tipo_reporte']));
     $desc_rep = $conn->real_escape_string(trim($_POST['descripcion_reporte']));
@@ -104,7 +191,10 @@ if (isset($_GET['resolver_reporte'])) {
     header("Location: admin.php?resuelto=reporte");
     exit();
 }
-// VISITAS Y RESERVAS
+
+// ==========================================
+// 5. VISITAS Y RESERVAS
+// ==========================================
 if (isset($_GET['eliminar_visita'])) {
     $id_visita = intval($_GET['eliminar_visita']);
     $conn->query("DELETE FROM visitas WHERE id_visita = $id_visita");
@@ -145,20 +235,21 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
 
     <div class="max-w-7xl mx-auto">
         
-        <!--BOTONES ALINEADOS -->
+        <!-- HEADER PRINCIPAL CON BOTONES ALINEADOS -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <h1 class="font-heading text-4xl font-bold text-white uppercase"><span class="text-brand">Admin</span> GYMICO</h1>
             
-            <!-- Botones Superiores -->
+            <!-- Grupo de Botones Superiores -->
             <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                <!-- Botón de Soporte -->
                 <a href="https://wa.me/525512345678?text=Hola,%20soy%20el%20administrador%20de%20GYMICO.%20Necesito%20reportar%20un%20error%20en%20el%20sistema." target="_blank" class="bg-dark-800 border border-green-500/50 hover:bg-green-900/40 text-green-400 px-4 py-2.5 rounded-lg font-bold transition flex items-center gap-2 shadow-lg justify-center text-sm">
                     <i class="fab fa-whatsapp text-lg"></i> Soporte (+52 55 1234 5678)
                 </a>
-                
-                <!-- Botón de Recepción -->
                 <a href="escaner.html" class="bg-dark-800 border border-dark-700 hover:bg-dark-700 text-white px-4 py-2.5 rounded-lg font-bold transition flex items-center gap-2 shadow-lg justify-center text-sm">
                     <i class="fas fa-id-card text-brand"></i> Ir a Recepción
+                </a>
+                <!-- NUEVO BOTÓN: Cerrar Sesión de Admin -->
+                <a href="admin.php?logout=1" class="border border-red-500 hover:bg-red-600/20 text-red-500 px-4 py-2.5 rounded-lg font-bold transition flex items-center gap-2 shadow-lg justify-center text-sm">
+                    <i class="fas fa-sign-out-alt"></i> Salir
                 </a>
             </div>
         </div>
@@ -174,7 +265,7 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
             <button onclick="mostrarTab('reservas')" id="btn-reservas" class="text-gray-400 font-bold uppercase pb-2 border-b-2 border-transparent hover:text-white transition whitespace-nowrap">Salas Reservadas</button>
         </div>
 
-        <!-- SOCIOS -->
+        <!-- TAB 1: SOCIOS -->
         <div id="tab-socios" class="block">
             <div class="flex justify-end mb-4">
                 <button onclick="abrirModal()" class="bg-brand hover:bg-red-700 text-white px-6 py-2 rounded-lg font-bold transition shadow-lg">
@@ -193,7 +284,7 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
             </div>
         </div>
 
-        <!-- MANTENIMIENTO -->
+        <!-- TAB 2: MANTENIMIENTO -->
         <div id="tab-mantenimiento" class="hidden">
             <div class="bg-dark-800 rounded-2xl p-8 border border-dark-700 shadow-xl">
                 <h2 class="font-heading text-2xl font-bold text-white uppercase mb-6">Gestión de Equipos en Mantenimiento</h2>
@@ -214,7 +305,7 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
             </div>
         </div>
 
-        <!-- VENTAS -->
+        <!-- TAB 3: VENTAS -->
         <div id="tab-ventas" class="hidden">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-dark-800 rounded-2xl p-6 border border-dark-700 shadow-xl">
@@ -279,7 +370,7 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
             </div>
         </div>
 
-        <!-- EMPLEADOS -->
+        <!-- TAB 4: EMPLEADOS -->
         <div id="tab-empleados" class="hidden">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-dark-800 rounded-2xl p-6 border border-dark-700 shadow-xl">
@@ -317,7 +408,7 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
             </div>
         </div>
 
-        <!-- REPORTES -->
+        <!-- TAB 5: REPORTES -->
         <div id="tab-reportes" class="hidden">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-dark-800 rounded-2xl p-6 border border-dark-700 shadow-xl">
@@ -343,7 +434,7 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
             </div>
         </div>
 
-        <!-- VISITAS AGENDADAS -->
+        <!-- TAB 6: VISITAS AGENDADAS -->
         <div id="tab-visitas" class="hidden">
             <div class="bg-dark-800 rounded-2xl p-8 border border-dark-700 shadow-xl">
                 <div class="flex items-center gap-3 mb-6">
@@ -397,7 +488,7 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
             </div>
         </div>
 
-        <!-- RESERVAS DE SALAS -->
+        <!-- TAB 7: RESERVAS DE SALAS -->
         <div id="tab-reservas" class="hidden">
             <div class="bg-dark-800 rounded-2xl p-8 border border-dark-700 shadow-xl">
                 <div class="flex items-center gap-3 mb-6">
@@ -445,7 +536,7 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
 
     </div>
 
-    <!-- Formulario Socios -->
+    <!-- Modal Formulario Socios -->
     <div id="modal-usuario" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
         <div class="bg-dark-800 p-8 rounded-xl w-full max-w-lg border border-dark-700 max-h-[90vh] overflow-y-auto">
             <h2 id="modal-titulo" class="font-heading text-2xl font-bold text-white uppercase mb-6">Registrar Socio</h2>
@@ -471,7 +562,7 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
         </div>
     </div>
 
-
+    <!-- SCRIPT -->
     <script>
         function mostrarTab(tabId) {
             const tabs = ['socios', 'mantenimiento', 'ventas', 'empleados', 'reportes', 'visitas', 'reservas'];
