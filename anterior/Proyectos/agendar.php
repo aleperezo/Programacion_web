@@ -136,7 +136,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['agendar_cita'])) {
                 </div>
             </div>
 
-            <div class="w-full lg:w-1/2 bg-dark-900 relative">
+            <!-- Contenedor con altura adaptativa en móviles (h-80 sm:h-96) y automático en PC (lg:h-auto) -->
+            <div class="w-full lg:w-1/2 bg-dark-900 relative h-80 sm:h-96 lg:h-auto">
                 <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=2074&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover opacity-40 grayscale contrast-125">
                 <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-transparent to-transparent"></div>
                 <div class="absolute bottom-0 left-0 w-full p-8 sm:p-12">

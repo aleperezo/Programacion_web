@@ -1,36 +1,27 @@
 <?php
-//Cargar la configuracion
-$config = require __DIR__ . '/config.php';
-//Si no encuentra el required, se detiene la ejecucion del script y muestra un error
+//cargar la configuracion
+$config = require __DIR__ . "/config.php";
 
-//Extraer las variable de entorno de config.php
-//Asignado a una variable para poder usarla en la conexion
+// Extraer las variables de entorno
+$host    = $config["DB_HOST"];
+$dbname  = $config["DB_NAME"];
+$user    = $config["DB_USER"];
+$pass    = $config["DB_PASS"];
+$charset = $config["DB_CHARSERT"];
 
-$host = $config['DB_HOST'];
-$dbname = $config['DB_NAME'];
-$user = $config['DB_USER'];
-$pass = $config['DB_PASS'];
-$charset = $config['DB_CHARSET'];
-
-//Opciones recomendadas para la conexion PDO
+// Opciones recomendadas para usar PDO
 $options = [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, //Lanzar excepciones en caso de error de MSQL
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, //Listar info y verla como arreglo asociativo (array)
-    PDO::ATTR_EMULATE_PREPARES => false, //No prepararemos consultas
-];
-//Hoja completa sobre que es el try y que es el catch una hoja de cada una, completa
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,//lanzar excepciones de Mysql
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES => false,
+    ];
 try{
-    //DSN:Indica el motor + host + nombre de la base de datos + charset
-    $dsn = "
-    mysql:host=$host;
-    dbname=$dbname;
-    charset=$charset";
-    $pdo = new PDO($dsn, $user, $pass, $options); //Metodos a ocupar
+    //DSN:indica el motor + host + nombreDB+chrset || configuracion
+    $dsn ="mysql:host=$host;dbname=$dbname;charset=$charset";
+    $pdo = new PDO($dsn, $user, $pass, $options);
 
 }catch(PDOException $e){
-    die("Error en la DB" . $e->getMessage());
-
+    die("Error en la DB". $e->getMessage());
 }
 
 ?>
-//No traje cocretas para la perra mamda que acabo de hacer

@@ -9,9 +9,11 @@ $input = file_get_contents("php://input");
 $data = json_decode($input, true);
 
 $id_usuario = isset($data['id_usuario']) ? intval($data['id_usuario']) : 0;
-$codigo_ingresado = isset($data['codigo']) ? trim($data['codigo']) : '';
+$codigo_ingresado = isset($data['codigo']) ? trim(strtoupper($data['codigo'])) : '';
 
-$codigo_del_dia = "GYM2026"; 
+// Código del día generado automáticamente por PHP (Ej: GYM20261023)
+// Cambiará solo cada día sin que tengas que moverle nada.
+$codigo_del_dia = "GYM" . date('Ymd'); 
 
 if ($codigo_ingresado !== $codigo_del_dia) {
     echo json_encode(['success' => false, 'mensaje' => 'Código diario incorrecto o expirado.']);

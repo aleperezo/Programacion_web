@@ -1,3 +1,4 @@
+-- Active: 1790221583716@@127.0.0.1@3306@crud_pdo
 CREATE DATABASE crud_pdo;
 USE crud_pdo;
 DROP TABLE IF EXISTS `alumnos`;

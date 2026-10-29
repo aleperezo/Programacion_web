@@ -14,10 +14,20 @@ if (!$res_usuario || $res_usuario->num_rows === 0) {
 
 $user = $res_usuario->fetch_assoc();
 $tipo_membresia = trim($user['tipo_membresia']); 
+
+// Precios sugeridos según el tipo de membresía
+$precios_membresias = [
+    'Basica' => 350.00,
+    'Básica' => 350.00,
+    'Premium' => 600.00,
+    'VIP' => 900.00
+];
+$monto_pago = isset($precios_membresias[$tipo_membresia]) ? $precios_membresias[$tipo_membresia] : 350.00;
+
 // PROCESAR EL PAGO EN LÍNEA DEL USUARIO
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['procesar_pago'])) {
     $concepto = "Pago Membresía " . $tipo_membresia . " (" . $user['nombre_completo'] . ")";
-    $monto = 450.00;
+    $monto = $monto_pago;
     
     $conn->query("INSERT INTO ventas (concepto, monto) VALUES ('$concepto', $monto)");
     $conn->query("UPDATE usuarios SET fecha_vencimiento = DATE_ADD(IFNULL(fecha_vencimiento, CURRENT_DATE), INTERVAL 30 DAY), estado = 'Pagado' WHERE id_usuario = $id_usuario");
@@ -25,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['procesar_pago'])) {
     echo "<script>alert('¡Pago procesado con éxito! Registrado en el sistema del administrador.'); window.location.href='panel.php';</script>";
     exit();
 }
+
 // PROCESAR EL APARTADO DE SALAS
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apartar_sala'])) {
     $sala = $conn->real_escape_string(trim($_POST['sala']));
@@ -206,7 +217,7 @@ $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
             </div>
         </section>
 
-        <!--  ASISTENCIA -->
+        <!-- ASISTENCIA -->
         <section id="asistencia">
             <div class="flex items-center gap-3 mb-6">
                 <i class="fas fa-calendar-check text-3xl text-brand"></i>
@@ -238,7 +249,7 @@ $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
             </div>
         </section>
 
-        <!-- SECCIÓN VIP, TIENE APARTAR SALAS -->
+        <!-- SECCIÓN VIP, APARTAR SALAS -->
         <?php if ($tipo_membresia === 'VIP'): ?>
             <section id="apartar-salas" class="bg-gradient-to-r from-dark-800 to-dark-900 border border-brand/50 rounded-2xl p-8 shadow-2xl">
                 <div class="flex items-center gap-3 mb-4">
@@ -355,8 +366,8 @@ $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
                 <?php
                 $sql_mant = "SELECT * FROM mantenimiento";
                 $res_mant = $conn->query($sql_mant);
-                if ($res_mant &&$res_mant->num_rows > 0):
-                    while($item =$res_mant->fetch_assoc()):
+                if ($res_mant && $res_mant->num_rows > 0):
+                    while($item = $res_mant->fetch_assoc()):
                 ?>
                     <div class="bg-dark-900 border border-red-500/30 rounded-xl p-4 flex flex-col justify-between relative overflow-hidden">
                         <div class="absolute top-0 right-0 bg-red-600 text-white text-[10px] font-bold px-3 py-0.5 uppercase tracking-wider rounded-bl-lg">
@@ -416,7 +427,7 @@ $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
                     </div>
                 </div>
                 <button type="submit" name="procesar_pago" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg transition uppercase tracking-wide cursor-pointer shadow-lg shadow-emerald-600/20 mt-4">
-                    Pagar $450.00 MXN
+                    Pagar $<?php echo number_format($monto_pago, 2); ?> MXN
                 </button>
             </form>
         </div>
@@ -451,7 +462,7 @@ $dias_restantes = (strtotime($fecha_vencimiento) - time()) / (60 * 60 * 24);
                 </div>
                 <div class="flex justify-between text-base font-bold pt-2">
                     <span class="text-white">Total Pagado:</span>
-                    <span class="text-emerald-400">$450.00 MXN</span>
+                    <span class="text-emerald-400">$<?php echo number_format($monto_pago, 2); ?> MXN</span>
                 </div>
             </div>
 

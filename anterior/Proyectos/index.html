@@ -153,7 +153,7 @@
         </div>
     </section>
 
-    <!-- Contacto) -->
+    <!-- Contacto -->
     <footer id="contacto" class="bg-black pt-16 pb-8 border-t border-dark-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
@@ -171,7 +171,9 @@
                         <li><button onclick="abrirModal('modal-membresias')" class="text-gray-400 hover:text-brand transition text-sm text-left cursor-pointer">Membresías</button></li>
                         <li><a href="sesiones.html" class="text-gray-400 hover:text-brand transition text-sm">Inicia Sesión</a></li>
                         <li><a href="agendar.php" class="text-gray-400 hover:text-brand transition text-sm">Agenda Visita</a></li>
-                        <!-- AQUÍ ESTÁ EL ATAJO SECRETO A ADMINISTRACIÓN -->
+                        <!-- ENLACE MODAL AVISO DE PRIVACIDAD -->
+                        <li><button onclick="abrirModal('modal-privacidad')" class="text-gray-400 hover:text-brand transition text-sm text-left cursor-pointer">Aviso de Privacidad</button></li>
+                        <!-- ATAJO SECRETO A ADMINISTRACIÓN -->
                         <li><a href="admin.php" class="text-gray-600 hover:text-brand transition text-sm"><i class="fas fa-user-shield mr-1"></i> Admin</a></li>
                     </ul>
                 </div>
@@ -300,6 +302,41 @@
                 </div>
             </div>
             <div class="text-center mt-6"><button onclick="cerrarModal('modal-membresias')" class="text-gray-400 hover:text-white text-sm font-medium cursor-pointer">Cerrar ventana</button></div>
+        </div>
+    </div>
+
+    <!-- MODAL DE AVISO DE PRIVACIDAD -->
+    <div id="modal-privacidad" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50 p-4">
+        <div class="bg-dark-800 p-8 rounded-2xl w-full max-w-3xl border border-dark-700 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="cerrarModal('modal-privacidad')" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl cursor-pointer"><i class="fas fa-times"></i></button>
+            
+            <div class="text-center mb-6">
+                <h2 class="font-heading text-3xl font-bold text-white uppercase">Aviso de <span class="text-brand">Privacidad</span></h2>
+                <p class="text-gray-400 text-xs mt-1">Última actualización: 2026</p>
+            </div>
+
+            <div class="space-y-4 text-gray-300 text-sm leading-relaxed text-left bg-dark-900 p-6 rounded-xl border border-dark-700 max-h-[50vh] overflow-y-auto">
+                <div>
+                    <h3 class="font-bold text-white uppercase mb-1 text-brand">1. Identidad y Domicilio</h3>
+                    <p><strong>GYMICO</strong>, con domicilio en Av. Central 123, es responsable del tratamiento y protección de sus datos personales de acuerdo con la ley aplicable.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white uppercase mb-1 text-brand">2. Datos Personales que Recabamos</h3>
+                    <p>Recabamos nombre completo, correo electrónico, teléfono y datos físicos opcionales (edad y peso) para control de rutinas y agendamiento de visitas.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white uppercase mb-1 text-brand">3. Finalidades del Tratamiento</h3>
+                    <p>Sus datos se utilizan para gestionar su registro como socio, coordinar visitas a las instalaciones, brindar acceso al sistema de control de asistencias y enviar avisos de su membresía.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white uppercase mb-1 text-brand">4. Derechos ARCO</h3>
+                    <p>Usted puede acceder, rectificar, cancelar u oponerse al uso de sus datos personales escribiendo directamente al correo de administración: <strong>contacto@gymico.com</strong>.</p>
+                </div>
+            </div>
+
+            <div class="text-center mt-6">
+                <button onclick="cerrarModal('modal-privacidad')" class="bg-brand hover:bg-red-700 text-white px-8 py-2.5 rounded-lg font-bold text-sm cursor-pointer transition uppercase tracking-wide">Cerrar</button>
+            </div>
         </div>
     </div>
 

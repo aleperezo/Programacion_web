@@ -1,7 +1,7 @@
 <?php
+error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 session_start();
 
 // ==========================================
@@ -65,7 +65,7 @@ if (!isset($_SESSION['admin_autorizado']) || $_SESSION['admin_autorizado'] !== t
 </body>
 </html>
 <?php
-    exit(); // ¡Súper importante! Esto evita que cargue el resto del panel si no tienen la contraseña.
+    exit(); 
 }
 
 // ==========================================
@@ -74,29 +74,32 @@ if (!isset($_SESSION['admin_autorizado']) || $_SESSION['admin_autorizado'] !== t
 require 'conexion.php';
 
 // ==========================================
-// LÓGICA PARA EXPORTAR A EXCEL
+// LÓGICA PARA EXPORTAR A CSV (SIN FECHA)
 // ==========================================
-if (isset($_GET['exportar']) && $_GET['exportar'] === 'excel') {
-    header("Content-Type: application/vnd.ms-excel; charset=utf-8");
-    header("Content-Disposition: attachment; filename=Reporte_Ventas_GYMICO.xls");
+if (isset($_GET['exportar']) && $_GET['exportar'] === 'csv') {
+    ini_set('display_errors', 0);
+    error_reporting(0);
+
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename=Reporte_Ventas_GYMICO.csv');
     
-    echo "<table border='1'>";
-    echo "<tr style='background-color: #dc2626; color: white;'>
-            <th>ID Venta</th><th>Concepto / Servicio</th><th>Monto Pagado</th><th>Fecha y Hora</th>
-          </tr>";
+    $output = fopen('php://output', 'w');
+    fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
+    
+    // Cabeceras del CSV (Solo ID, Concepto y Monto)
+    fputcsv($output, array('ID Venta', 'Concepto / Servicio', 'Monto Pagado'), ',', '"', '\\');
     
     $ventas_excel = $conn->query("SELECT * FROM ventas ORDER BY fecha_venta DESC");
     if($ventas_excel) {
         while ($row = $ventas_excel->fetch_assoc()) {
-            echo "<tr>";
-            echo "<td>" . $row['id_venta'] . "</td>";
-            echo "<td>" . utf8_decode($row['concepto']) . "</td>";
-            echo "<td>$" . number_format($row['monto'], 2) . "</td>";
-            echo "<td>" . $row['fecha_venta'] . "</td>";
-            echo "</tr>";
+            fputcsv($output, array(
+                $row['id_venta'],
+                $row['concepto'],
+                '$' . number_format($row['monto'], 2)
+            ), ',', '"', '\\');
         }
     }
-    echo "</table>";
+    fclose($output);
     exit();
 }
 
@@ -126,10 +129,17 @@ if (isset($_GET['resolver'])) {
 // ==========================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['guardar_venta'])) {
     $id_venta = isset($_POST['id_venta']) ? intval($_POST['id_venta']) : 0;
-    $concepto = $conn->real_escape_string(trim($_POST['concepto']));
+    $concepto_base = $conn->real_escape_string(trim($_POST['concepto']));
+    $persona = isset($_POST['persona']) ? trim($_POST['persona']) : '';
     $monto = floatval($_POST['monto']);
 
-    if (!empty($concepto) && $monto > 0) {
+    if (!empty($concepto_base) && $monto > 0) {
+        $concepto = $concepto_base;
+        if (!empty($persona)) {
+            $concepto .= " (" . $persona . ")";
+        }
+        $concepto = $conn->real_escape_string($concepto);
+
         if ($id_venta > 0) {
             $conn->query("UPDATE ventas SET concepto='$concepto', monto=$monto WHERE id_venta=$id_venta");
         } else {
@@ -247,7 +257,6 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
                 <a href="escaner.html" class="bg-dark-800 border border-dark-700 hover:bg-dark-700 text-white px-4 py-2.5 rounded-lg font-bold transition flex items-center gap-2 shadow-lg justify-center text-sm">
                     <i class="fas fa-id-card text-brand"></i> Ir a Recepción
                 </a>
-                <!-- NUEVO BOTÓN: Cerrar Sesión de Admin -->
                 <a href="admin.php?logout=1" class="border border-red-500 hover:bg-red-600/20 text-red-500 px-4 py-2.5 rounded-lg font-bold transition flex items-center gap-2 shadow-lg justify-center text-sm">
                     <i class="fas fa-sign-out-alt"></i> Salir
                 </a>
@@ -324,8 +333,12 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
                             </select>
                         </div>
                         <div>
+                            <label class="block text-sm text-gray-400 mb-1">Nombre / Persona (Opcional)</label>
+                            <input type="text" name="persona" id="form-venta-persona" placeholder="Ej. Juan Pérez" class="w-full bg-dark-900 border border-dark-700 text-white px-4 py-2.5 rounded-lg text-sm">
+                        </div>
+                        <div>
                             <label class="block text-sm text-gray-400 mb-1">Monto ($)</label>
-                            <input type="number" step="0.01" name="monto" id="form-venta-monto" required class="w-full bg-dark-900 border border-dark-700 text-white px-4 py-2.5 rounded-lg">
+                            <input type="number" step="0.01" name="monto" id="form-venta-monto" required class="w-full bg-dark-900 border border-dark-700 text-white px-4 py-2.5 rounded-lg" placeholder="0.00">
                         </div>
                         <button type="submit" name="guardar_venta" id="btn-guardar-venta" class="w-full bg-brand text-white font-bold py-2.5 rounded-lg">Guardar Venta</button>
                         <button type="button" onclick="limpiarFormVenta()" class="w-full bg-dark-700 text-gray-300 font-bold py-2 rounded-lg text-xs mt-2">Limpiar / Cancelar Edición</button>
@@ -335,7 +348,10 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
                 <div class="bg-dark-800 rounded-2xl p-6 border border-dark-700 shadow-xl md:col-span-2">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="font-heading text-xl font-bold text-white uppercase">Historial de Ventas</h3>
-                        <a href="admin.php?exportar=excel" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold text-xs"><i class="fas fa-file-excel mr-1"></i> Descargar Excel</a>
+                        <!-- BOTÓN DE CSV ESTÉTICO Y MODERNO -->
+                        <a href="admin.php?exportar=csv" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-lg shadow-emerald-900/30 transition flex items-center gap-2">
+                            <i class="fas fa-file-csv text-base"></i> Descargar CSV
+                        </a>
                     </div>
                     <div class="overflow-x-auto max-h-[400px] overflow-y-auto">
                         <table class="w-full text-left border-collapse">
@@ -564,6 +580,36 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
 
     <!-- SCRIPT -->
     <script>
+        // Precios sugeridos para cada concepto de venta
+        const preciosSugeridos = {
+            "Membresia Basica": 350,
+            "Membresia Premium": 600,
+            "Membresia VIP": 900,
+            "Inscripcion": 200,
+            "Renta de Sala": 500,
+            "Suplemento": 250
+        };
+
+        const selectConcepto = document.getElementById('form-venta-concepto');
+        const inputMonto = document.getElementById('form-venta-monto');
+
+        // Al cambiar de concepto, actualizar el monto sugerido automáticamente
+        selectConcepto.addEventListener('change', function() {
+            if (preciosSugeridos[this.value] !== undefined) {
+                inputMonto.value = preciosSugeridos[this.value];
+            }
+        });
+
+        // Poner precio inicial al cargar la página si el input está vacío
+        document.addEventListener('DOMContentLoaded', () => {
+            if (selectConcepto && inputMonto && !inputMonto.value) {
+                if (preciosSugeridos[selectConcepto.value] !== undefined) {
+                    inputMonto.value = preciosSugeridos[selectConcepto.value];
+                }
+            }
+            cargarUsuarios();
+        });
+
         function mostrarTab(tabId) {
             const tabs = ['socios', 'mantenimiento', 'ventas', 'empleados', 'reportes', 'visitas', 'reservas'];
             tabs.forEach(t => {
@@ -574,10 +620,20 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
             document.getElementById('btn-' + tabId).className = "text-brand font-bold uppercase pb-2 border-b-2 border-brand transition whitespace-nowrap";
         }
 
-        // --- Funciones para Ventas (Editar) ---
+        // --- Funciones para Ventas (Editar y Limpiar) ---
         function editarVenta(id, concepto, monto) {
             document.getElementById('form-venta-id').value = id;
-            document.getElementById('form-venta-concepto').value = concepto;
+            
+            let conceptoBase = concepto;
+            let personaVal = "";
+            const match = concepto.match(/^(.*?)\s*\((.*?)\)$/);
+            if (match) {
+                conceptoBase = match[1].trim();
+                personaVal = match[2].trim();
+            }
+
+            document.getElementById('form-venta-concepto').value = conceptoBase;
+            document.getElementById('form-venta-persona').value = personaVal;
             document.getElementById('form-venta-monto').value = monto;
             document.getElementById('titulo-form-venta').innerText = "Editar Venta #" + id;
             document.getElementById('btn-guardar-venta').innerText = "Actualizar Venta";
@@ -587,7 +643,8 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
         function limpiarFormVenta() {
             document.getElementById('form-venta-id').value = "0";
             document.getElementById('form-venta-concepto').value = "Membresia Basica";
-            document.getElementById('form-venta-monto').value = "";
+            document.getElementById('form-venta-persona').value = "";
+            document.getElementById('form-venta-monto').value = preciosSugeridos["Membresia Basica"] || "";
             document.getElementById('titulo-form-venta').innerText = "Registrar Venta";
             document.getElementById('btn-guardar-venta').innerText = "Guardar Venta";
         }
@@ -608,7 +665,6 @@ $resultado_reservas = $conn->query("SELECT * FROM reservas_salas ORDER BY fecha_
             document.getElementById('btn-guardar-emp').innerText = "Registrar";
         }
 
-        document.addEventListener('DOMContentLoaded', cargarUsuarios);
         async function cargarUsuarios() {
             try {
                 const respuesta = await fetch('api_usuarios.php');
