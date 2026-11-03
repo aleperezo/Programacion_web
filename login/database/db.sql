@@ -1,0 +1,15 @@
+-- Active: 1790221583716@@127.0.0.1@3306@login_mvc
+-- Active: 1790221583716@@127.0.0.1@3306@login_mvc
+
+CREATE DATABASE IF NOT EXISTS login_mvc CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+USE login_mvc;
+CREATE TABLE IF NOT EXISTS users (
+   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+   nombre VARCHAR(250) NOT NULL,
+   correo VARCHAR(250) NOT NULL,
+   password VARCHAR(250) NOT NULL,
+   creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   PRIMARY KEY (id),
+   UNIQUE KEY correo (correo)
+);
