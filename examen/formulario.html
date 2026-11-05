@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Alumnos</title>
+</head>
+<body>
+
+    <h1>Formulario de Registro</h1>
+
+    <!-- El formulario envía la información mediante POST al archivo guardar.php -->
+    <form action="guardar.php" method="POST">
+        
+        <label for="nombre">Nombre:</label>
+        <input name="nombre" id="nombre" type="text" placeholder="Ingresa tu nombre" maxlength="150" required>
+        <br><br>
+        
+        <label for="correo">Correo:</label>
+        <!-- HTML5 usa type="email" para validar automáticamente el formato -->
+        <input name="correo" id="correo" type="email" placeholder="Ingresa tu correo" required>
+        <br><br>
+        
+        <label for="edad">Edad:</label>
+        <!-- HTML5 usa type="number" para permitir solo números -->
+        <input name="edad" id="edad" type="text" placeholder="Ingresa tu edad" maxlength="3"required>
+        <br><br>
+        
+        <button type="submit">Enviar información</button>
+        
+    </form>
+
+</body>
+</html>
