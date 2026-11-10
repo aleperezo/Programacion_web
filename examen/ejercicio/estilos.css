@@ -1,0 +1,53 @@
+body {
+    font-family: sans-serif;
+    background-color: #f4f4f4;
+    margin: 15px;
+}
+
+header {
+    background-color: #9b9898;
+    color: white;
+    padding: 10px;
+    border: 1px solid black;
+}
+
+nav ul {
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin-right: 15px;
+}
+
+nav ul li a {
+    color: white;
+}
+
+section {
+    background-color: #9dbade;
+    padding: 15px;
+    margin-top: 20px;
+    border: 2px solid black;
+    width: 50%;
+}
+
+form label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+form input {
+    margin-top: 5px;
+    padding: 5px;
+}
+
+form button {
+    display: block;
+    margin-top: 20px;
+    padding: 8px 15px;
+    background-color: rgb(133, 181, 152);
+    border: 1px solid black;
+    color: black;
+}

@@ -18,6 +18,29 @@ class Usuario {
     //function para generar un registro de un usuario
     public function registrar(string $nombre, string $correo, string $hash):int{
         //hash es la contraseña encriptada
-        
+        $pdo = $this->conexion->obtener();
+        $sql='INSERT INTO usuarios (nombre, correo, password_hash) VALUES (:nombre, :correo, :hash)';
+        $consulta = $pdo->prepare($sql);
+        $consulta->execute([
+        'nombre' => $nombre, 
+        'correo' => $correo, 
+        'password_hash' => $hash]);
+        //devuelve el ID del usuario registrado
+        return (int) $pdo->lastInsertId();
+    }
+
+    public function listar(): array {
+        $sql = 'SELECT id, nombre, correo FROM usuarios ORDER BY nombre ASC';
+        $consulta = $this->conexion->obtener()->query($sql)->fetchAll();
+        return $consulta->fetchAll();
+    }
+
+    public function actualizarHash(int $id, string $hash): void {
+        $sql = 'UPDATE usuarios SET password_hash = :hash WHERE id = :id';
+        $consulta = $this->conexion->obtener()->prepare($sql);
+        $consulta->execute([
+            'hash' => $hash, 
+            'id' => $id]);
+        return $consulta->execute(['hash' => $hash, 'id' => $id]);
     }
 }
